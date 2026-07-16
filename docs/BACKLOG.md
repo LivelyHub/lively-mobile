@@ -2,7 +2,7 @@
 
 > The family-facing app (Expo / React Native). Derived from [CORE.md](../CORE.md) (shared contract — verbatim copy of the source of truth in `lively-backend`), and the `lively-backend` SPEC/PLAN. The backend backlog lives in `lively-backend/docs/BACKLOG.md`; every story here depends on an endpoint there.
 
-**Priorities:** **P0** demo spine · **P1** credible demo · **P2** polish. The irreducible core is the screens that show elder creation, conversation, and the chair-test chart.
+**Priorities:** **P0** demo spine · **P1** credible demo · **P2** polish. The irreducible core is the screens that show elder creation, conversation, and the chair-test chart. Cut-order: Titipan and Alerts push drop first, then M11 (performance report) — the M5.1 progress bar/streak/graphs already ship most of the gamification value cheaply.
 
 **How to use this file:** work stories in priority order. Tick each acceptance box **in the same PR that satisfies it** — this is the shared, checkable progress record. Every mobile story lists the **UI states** it must ship; a screen with only a happy path is an unfinished story. State definitions, skeleton specs, and copy tone are in [UI-UX-GUIDELINES.md](UI-UX-GUIDELINES.md). See [../AGENTS.md](../AGENTS.md) for the working agreement.
 
@@ -104,14 +104,16 @@ Read-only window into Eyang ↔ companion — sells "there's a real relationship
 ## Epic M5 — Progress screen `P0`
 
 ### M5.1 Progress dashboard `P0`
-Where the 8→12 chair-test arc — the demo's clinical proof — renders.
+Where the 8→12 chair-test arc — the demo's clinical proof — renders. Also the gamification screen (CORE.md §7, added post-kickoff per mentor/judge feedback): family-facing progress bar + streak + richer graphs, so checking in reads as a shared win, not a chore. See UI-UX-GUIDELINES.md §1 note on keeping this family-facing, not elder-facing.
 **UI states:** skeleton (chart block + streak row + list rows) · per-section empty (no chair tests → "Tes kursi pertama {honorific} akan muncul di sini" + a one-line explainer) · error + retry · pull-to-refresh.
+- [ ] **Overall progress bar:** single bar/ring from `overall_progress_pct` (0-100), headline number, no numeric target shown to imply a "score to beat" — just "how {honorific} is doing"
 - [ ] **Chair-test chart:** line/area of reps over time (`victory-native` or `react-native-gifted-charts`), dots on points, latest called out ("12 kali — naik dari 8!"); y-axis from 0; ≤2 points → big-number cards instead of a silly 2-point line
-- [ ] **Exercise streak:** current streak + this-week day dots (done/missed/future)
-- [ ] **Medication adherence (P1, lands with backend B6):** 7-day ring/bar + unconfirmed-today list
+- [ ] **Engagement streak:** `engagement_streak_days` as the headline streak number ("🔥 5 hari berturut-turut"), plus the existing exercise-specific streak + this-week day dots (done/missed/future) below it
+- [ ] **Exercise history graph:** calendar-dot strip from `exercise_history` (last 30 days), same visual language as the streak dots, just longer window
+- [ ] **Medication adherence trend (P1, lands with backend B6):** 7-day ring/bar from `medication_adherence`, plus a 30-day trend line from `medication_adherence_trend` + unconfirmed-today list
 - [ ] Single `GET /elders/:id/progress` fetch → single skeleton, no waterfall
 
-**Test:** seeded shows 8→12 with callout; fresh elder shows empty explainers; curl a new chair test → pull-to-refresh updates chart.
+**Test:** seeded shows 8→12 with callout, progress bar computed correctly, streak matches seed data; fresh elder shows empty explainers and a 0% bar (not an error); curl a new chair test → pull-to-refresh updates chart + bar.
 **Depends on:** M0.3, backend B5.3.
 
 ---
@@ -198,6 +200,21 @@ Day 3 morning. Walk the [UI-UX-GUIDELINES.md](UI-UX-GUIDELINES.md) §2 matrix ag
 
 ---
 
+## Epic M11 — Performance report `P1` 🟡 first-in-line to cut
+Post-kickoff addition (mentor/judge feedback). A week/month summary card for the family member — the thing you'd screenshot and send to a sibling. M5.1's progress bar/streak/graphs already carry most of the gamification value cheaply; this is the one genuinely new screen, so it drops first if Day 3 runs short (PLAN.md cut-order).
+
+### M11.1 Performance report card `P1`
+**UI states:** skeleton (headline + 2 stat rows) · empty (gentle zero-state copy, not an error) · error + retry · pull-to-refresh · period toggle (week/month).
+- [ ] Entry point: card on Progress screen ("Lihat ringkasan minggu ini") opening a report view/sheet
+- [ ] Renders `GET /elders/:id/report?period=week|month`: headline, consistency %, exercise completion, medication adherence %, chair-test trend, highlights list, areas-needing-support list
+- [ ] Copy always leads positive (CORE §7); `areas_needing_support` rendered as gentle suggestions, never a red/alarming style — this is encouragement, not the Alerts screen
+- [ ] Week/month toggle refetches with the new `period` param
+
+**Test:** seeded week → headline + highlights match seed data; fresh elder → zero-state copy, not blank/error; toggle to month → different range, no layout jump.
+**Depends on:** M5.1, backend B10.1.
+
+---
+
 ## Traceability — CORE.md → screen
 
 | CORE.md / product need | Stories |
@@ -208,6 +225,7 @@ Day 3 morning. Walk the [UI-UX-GUIDELINES.md](UI-UX-GUIDELINES.md) §2 matrix ag
 | §2 medications — management + adherence | M6.1, M5.1 |
 | §2 alerts (6 types) + §6 escalation copy tiers | M8.1, M8.2 |
 | §2 titipan | M7.1 |
+| §2 `/progress` · `/report` + §7 progress bar/streak/graphs/report | M5.1, M11.1 |
 | Elder CRUD | M2.1, M3.1, M9.1 |
 | Auth model (family JWT) | M1.1 |
 | Push delivery (SPEC §6 — mobile's concern) | M8.1 |

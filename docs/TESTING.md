@@ -19,14 +19,14 @@ Run on a **physical device**. Every cell of the [UI-UX-GUIDELINES.md](UI-UX-GUID
 - [ ] Empty state shows a visual + copy + CTA (never a blank list)
 - [ ] Error state has a working Retry that actually refetches
 - [ ] Offline: banner shows; cached content still visible; mutations fail gracefully with a toast + preserved input
-- [ ] Pull-to-refresh works where specified (Home, Chat, Progress, Alerts, Meds)
+- [ ] Pull-to-refresh works where specified (Home, Chat, Progress, Alerts, Meds, Performance report)
 - [ ] No spinner runs > 10s (timeout → error state)
 - [ ] Text doesn't overflow at 130% OS font scale (caregivers skew older)
 - [ ] Honorific interpolation correct on every string (never "null" or a bare name)
 
 ## 2. Driving live updates (operator curl)
 
-The mobile team doesn't need `lively-bot` running — the operator curl script in `lively-backend/docs/TESTING.md` §3 posts inbound messages, chair tests, medication logs, and alerts. Keep a copy handy; use it to verify Chat Monitor live-append (M4), Progress refresh (M5), medication slot flips (M6), and the alert banner + push (M3/M8).
+The mobile team doesn't need `lively-bot` running — the operator curl script in `lively-backend/docs/TESTING.md` §3 posts inbound messages, chair tests, medication logs, and alerts. Keep a copy handy; use it to verify Chat Monitor live-append (M4), Progress refresh including the progress bar/streak (M5), medication slot flips (M6), the alert banner + push (M3/M8), and the performance report picking up the same posted data on its next fetch (M11).
 
 ## 3. Mock mode (build offline, survive venue Wi-Fi)
 

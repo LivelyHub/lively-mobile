@@ -24,14 +24,15 @@
 **Day 2 — 2026-07-17 — integrate backend + remaining screens**
 - Wire selection flow to `lively-backend` (`POST /elders`, `PATCH /elders/:id`).
 - Build Chat Monitor (poll or subscribe to `GET /elders/:id/conversation`), titipan send (`POST /elders/:id/titipan`).
-- Build Progress screen (streak calendar, chair-test chart), medication list (add/edit routine medicine via `POST /medications`), and Alerts screen (push on missed-day/medication-missed/pain/no-response/emergency).
+- Build Progress screen (progress bar, engagement streak calendar, chair-test chart, exercise/medication graphs — CORE.md §7), medication list (add/edit routine medicine via `POST /medications`), and Alerts screen (push on missed-day/medication-missed/pain/no-response/emergency).
 
 **Day 3 — 2026-07-18 — polish, demo rehearsal, submit**
 - Seed demo elder "Eyang Uti" data via backend, verify all four screens render real (not mock) data.
+- If time allows: Performance report card (M11 — week/month summary, genuinely new work, not a reuse of the M5.1 fetch). Build only after the P0 spine is green.
 - Rehearse the live demo flow 3× with a timer (companion switch, typing-indicator magic moment, titipan loop).
 - Submit with margin before deadline.
 
 ## Honest feasibility verdict
 Achievable in this window **if** the styling-tool decision (NativeWind vs plain StyleSheet) is locked within the first hour of Day 1 — this is the one place "faster dev tooling" could backfire by adding setup friction under time pressure. Biggest schedule risk is backend API not being ready by Day 2 morning; mitigation is building all four screens against mocked JSON first, swapping in real API calls once `lively-backend` exposes endpoints (per CORE.md, mobile only needs `/elders`, `/elders/:id/conversation`, `/elders/:id/titipan` — the smallest slice).
 
-Cut-order if time compresses: drop Alerts push notifications and titipan relay last-in-first-cut (fall back to just displaying them in-app without real push); the irreducible core is the companion selection flow + Chat Monitor, since those two carry the demo's opening and "magic moment" beats.
+Cut-order if time compresses: drop Alerts push notifications and titipan relay last-in-first-cut (fall back to just displaying them in-app without real push), then M11 (performance report) — the progress bar/streak/graphs on the Progress screen already deliver most of the gamification value from mentor/judge feedback at near-zero extra cost, since they ride the same fetch. The irreducible core is the companion selection flow + Chat Monitor, since those two carry the demo's opening and "magic moment" beats.

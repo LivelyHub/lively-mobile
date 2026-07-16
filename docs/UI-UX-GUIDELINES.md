@@ -10,6 +10,8 @@ The user is an adult child worried about a parent far away. Every choice serves 
 
 Corollaries: no dark patterns, no gamifying a parent's health, honorifics everywhere (CORE §3 — the companion never uses a bare first name, and neither does the app).
 
+**Scope of "no gamifying":** the elder never sees the app — Lively's whole thesis is that elders adopt nothing (SPEC §3). So the progress bar, engagement streak, and graphs on the Progress screen (CORE §7, added post-kickoff per mentor/judge feedback) are not gamifying the elder's health; they're a warm status readout for the family member who *is* the user. Keep it that way: no leaderboards, no badges, no "beat yesterday's score" framing, no competitive language, no number pushed to the elder over WhatsApp. The bar/streak communicate "here's how {honorific} is doing," full stop — same reassurance-by-default register as the rest of the app.
+
 ## 2. The state matrix (enforceable)
 
 Every screen implements every applicable state. "—" = not applicable. This table is the M10.1 audit sheet.
@@ -20,7 +22,8 @@ Every screen implements every applicable state. "—" = not applicable. This tab
 | Setup wizard | — | — | keep input, retry | block submit, banner | — | — |
 | Home | elder card + 3 status rows | "Tambah Eyang" hero | full-screen ErrorState | banner + cache | ✅ | 60s poll |
 | Chat Monitor | 5 alternating bubble skeletons | companion-will-greet copy | full-screen ErrorState | banner + cached messages | ✅ | 10s `?after=` poll |
-| Progress | chart block + streak row | per-section explainers | full-screen ErrorState | banner + cache | ✅ | on refresh |
+| Progress | chart block + streak row + progress bar | per-section explainers | full-screen ErrorState | banner + cache | ✅ | on refresh |
+| Performance report | headline + 2 stat-row skeletons | gentle zero-state copy | full-screen ErrorState | banner + cache | ✅ | on refresh / period toggle |
 | Medications | 3 list-row skeletons | add-first-med CTA | full-screen ErrorState | banner + cache; toggle rolls back | ✅ | on refresh |
 | Alerts | 3 alert-row skeletons | "semua baik-baik saja" | full-screen ErrorState | banner + cache | ✅ | 60s poll + push |
 | Alert detail | row skeletons | — | ErrorState | cache | — | — |
@@ -39,7 +42,8 @@ Every screen implements every applicable state. "—" = not applicable. This tab
 - Never a blank list. Always: a soft visual (emoji-scale illustration is enough) + a one-line reason + a CTA when the user can act. Empty states carry the product's warmth; they are first-run screens.
   - Chat: "Belum ada percakapan — Mbak Asih akan menyapa Eyang Uti besok pagi"
   - Alerts: "Tidak ada peringatan. Eyang Uti baik-baik saja" (reassurance, not absence)
-  - Progress: "Tes kursi pertama Eyang Uti akan muncul di sini" + a one-liner on what the chair test measures
+  - Progress: "Tes kursi pertama Eyang Uti akan muncul di sini" + a one-liner on what the chair test measures; progress bar shows 0% with the same forward-looking tone, never "0% — no activity" alarm framing
+  - Performance report: "Belum cukup data minggu ini — ringkasan akan muncul setelah {honorific} mulai beraktivitas" (forward-looking, not a judgment)
 - Distinguish "no data yet" (warm, forward-looking) from "filtered to nothing" (offer to clear the filter).
 
 **Error**

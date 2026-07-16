@@ -18,7 +18,7 @@
 ## 3. Concept
 - Family member downloads the app, picks a companion for their parent (Mbak Asih or Mas Budi), sets the honorific and health flags — this triggers the companion's first WhatsApp message to the parent.
 - Family member reads the ongoing conversation (Chat Monitor) and can send a "titipan" (a message the companion relays in character).
-- Progress screen shows streaks and 30s Chair Stand scores over time — the clinical signal underneath the chat.
+- Progress screen shows a progress bar, engagement streak, and 30s Chair Stand scores over time — the clinical signal underneath the chat, framed so the family member wants to check in rather than feeling like they're auditing a chore (post-kickoff mentor/judge feedback — see CORE.md §7). A weekly/monthly performance report card summarizes the same data for a quick "how's Eyang doing" check.
 - Family member adds the elder's routine long-term medications (name, dosage, times); the companion reminds at each scheduled time over the same chat and logs confirmations, same UX pattern as exercise check-ins.
 - Alerts screen implements the reverse-Duolingo loop: missed days nudge the child to call, not the elder to open an app — and escalates hard (immediate push) if the elder mentions pain/dizziness, doesn't respond within the check-in window, or something is flagged as an emergency.
 - Alternative considered: giving the elder their own app account too. Rejected for MVP — the entire product thesis is that elders adopt nothing; only the family installs.
@@ -29,9 +29,10 @@
 - Companion switch (Mbak Asih ↔ Mas Budi) mid-conversation
 - Chat Monitor (read-only conversation view)
 - Titipan message relay (family → companion → elder)
-- Progress screen (streak calendar + chair-test chart)
+- Progress screen (progress bar, engagement streak calendar, chair-test chart, exercise/medication history graphs — CORE.md §7)
 - Medication list management (add/edit routine long-term medicine + schedule times) — companion reminds and logs doses over chat
 - Alerts screen (missed-day, medication-missed, pain/dizziness mention, no-response, emergency push)
+- Performance report card (weekly/monthly summary, P1 — CORE.md §7)
 
 **Explicitly NOT in MVP** → §6.
 
@@ -56,6 +57,7 @@ No direct connection to `lively-bot` or WhatsApp — mobile only ever talks to `
 - 🔴 Styling-tool choice (NativeWind + react-native-reusables) unconfirmed — could add setup friction under time pressure if it doesn't play well with Expo Go. Resolve first hour of Day 1; fall back to plain StyleSheet if blocked.
 - 🟡 Push notification provider (Expo push vs Firebase) not chosen — pick Day 1, needed for Alerts screen.
 - 🟡 Backend API availability timeline — mobile builds against mocked data until `lively-backend` exposes real endpoints (target: Day 2).
+- 🔴 Gamification scope (progress bar, streak, graphs, performance report) landed after Day 1 kickoff with ~2 days left. Mitigated by design: M5.1's additions reuse the existing `GET /progress` fetch (no new request), and M11 (performance report) is a separate, cuttable screen — see PLAN.md cut-order.
 - 🟢 Expo QR-install for judges is low-risk — standard hackathon pattern.
 
 ## 8. Submission checklist (mapped to THIS event's deliverables)
