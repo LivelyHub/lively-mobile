@@ -20,6 +20,10 @@ export default function AppLayout() {
         name="settings"
         options={{ presentation: 'modal', headerShown: true, title: 'Pengaturan' }}
       />
+      <Stack.Screen
+        name="gallery"
+        options={{ headerShown: true, title: 'Component Gallery' }}
+      />
     </Stack>
   );
 }

@@ -22,9 +22,9 @@
 
 ### M0.2 Design tokens + base components `P0`
 No ad-hoc hex or font sizes in screens — everything draws from tokens.
-- [ ] Token file: palette (warm primary, urgency tiers per UI-UX §5), type scale (body ≥ 16), spacing (4pt grid), radii, shadows
-- [ ] Base components: `Button` (default/loading/disabled), `Card`, `TextField` (label/error/helper), `Skeleton` (shimmer primitive), `EmptyState` (visual + title + body + CTA), `ErrorState` (message + retry), `Toast`, `Banner`
-- [ ] Light theme only, tokens structured so dark is a palette swap
+- [x] Token file: palette (warm primary, urgency tiers per UI-UX §5), type scale (body ≥ 16), spacing (4pt grid), radii, shadows
+- [x] Base components: `Button` (default/loading/disabled), `Card`, `TextField` (label/error/helper), `Skeleton` (shimmer primitive), `EmptyState` (visual + title + body + CTA), `ErrorState` (message + retry), `Toast`, `Banner`
+- [x] Light theme only, tokens structured so dark is a palette swap
 
 **Test:** a dev gallery screen renders every base component in every state — doubles as the visual QA surface.
 **Depends on:** M0.1.
