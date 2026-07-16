@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Avatar } from '@/components/ui/Avatar';
 import { colors, radii, shadow, spacing, typography } from '@/constants/tokens';
 import type { Persona } from './config';
 
@@ -31,9 +32,7 @@ export function PersonaCard({ persona, honorific, selected, onPress }: PersonaCa
       ]}
     >
       <View style={styles.header}>
-        <View style={[styles.avatar, { backgroundColor: persona.tint }]}>
-          <Text style={[styles.avatarText, { color: persona.tintText }]}>{persona.initials}</Text>
-        </View>
+        <Avatar initials={persona.initials} tint={persona.tint} tintText={persona.tintText} size={56} />
         <View style={styles.headerText}>
           <Text style={styles.name}>{persona.displayName}</Text>
           <Text style={styles.personality}>{persona.personality}</Text>
@@ -72,16 +71,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-  },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: radii.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    ...typography.section,
   },
   headerText: {
     flex: 1,

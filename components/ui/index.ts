@@ -1,3 +1,4 @@
+export { Avatar } from './Avatar';
 export { Banner, type BannerVariant } from './Banner';
 export { Button, type ButtonVariant } from './Button';
 export { Card } from './Card';

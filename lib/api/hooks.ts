@@ -21,8 +21,17 @@ import type {
 
 // ---- Queries ----
 
-export function useElders() {
-  return useQuery({ queryKey: queryKeys.elders.list(), queryFn: api.getElders });
+// Screens may pass a poll interval (Home polls elders + alerts every 60s while
+// focused; refetch pauses automatically when the app is backgrounded via the
+// AppState-backed focusManager wired in lib/query).
+type PollOptions = { refetchInterval?: number };
+
+export function useElders(options: PollOptions = {}) {
+  return useQuery({
+    queryKey: queryKeys.elders.list(),
+    queryFn: api.getElders,
+    refetchInterval: options.refetchInterval,
+  });
 }
 
 export function useConversation(elderId: string, params: ConversationQuery = {}) {
@@ -49,8 +58,12 @@ export function useMedications(elderId: string) {
   });
 }
 
-export function useAlerts() {
-  return useQuery({ queryKey: queryKeys.alerts.all(), queryFn: api.getAlerts });
+export function useAlerts(options: PollOptions = {}) {
+  return useQuery({
+    queryKey: queryKeys.alerts.all(),
+    queryFn: api.getAlerts,
+    refetchInterval: options.refetchInterval,
+  });
 }
 
 export function useTitipanList(elderId: string) {

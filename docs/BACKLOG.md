@@ -74,11 +74,11 @@ Where the family "hires" a companion for Eyang — the emotional core of onboard
 
 ### M3.1 Home screen `P0`
 **UI states:** skeleton (elder card + 3 status rows shaped) · empty (no elders → warm hero + "Tambah Eyang" CTA) · error + retry · offline banner + cache · pull-to-refresh.
-- [ ] Elder card: honorific + name, companion avatar + name, "last heard from" relative time
-- [ ] Today-at-a-glance: morning check-in status, exercise done?, medications (2/3 confirmed)
-- [ ] Unresolved-alert banner pinned on top (urgency-tiered color, taps to Alerts) — the most important pixel when present
-- [ ] Quick actions: Chat · Progress · Titipan
-- [ ] Data: `GET /elders` + unresolved alerts; 60s poll while focused
+- [x] Elder card: honorific + name, companion avatar + name, "last heard from" relative time
+- [x] Today-at-a-glance: morning check-in status, exercise done?, medications (2/3 confirmed)
+- [x] Unresolved-alert banner pinned on top (urgency-tiered color, taps to Alerts) — the most important pixel when present
+- [x] Quick actions: Chat · Progress · Titipan
+- [x] Data: `GET /elders` + unresolved alerts; 60s poll while focused
 
 **Test:** fresh account → empty state; seeded → Eyang Uti card with live status; raise an alert via curl → banner within a poll cycle.
 **Depends on:** M0.3, backend B3.3, B7.3.
@@ -211,7 +211,7 @@ Post-kickoff addition (mentor/judge feedback). A week/month summary card for the
 - [ ] Week/month toggle refetches with the new `period` param
 
 **Test:** seeded week → headline + highlights match seed data; fresh elder → zero-state copy, not blank/error; toggle to month → different range, no layout jump.
-**Depends on:** M5.1, backend B10.1.
+**Depends on:** M5.1, backend `GET /elders/:id/report`.
 
 ---
 

@@ -1,5 +1,5 @@
-import { colors } from '@/constants/tokens';
 import type { CompanionKey } from '@/lib/api/types';
+import { COMPANION_META, type CompanionMeta } from '@/lib/companions';
 
 // Static content for the setup wizard (M2.1): the honorific presets, the two
 // fixed personas (CORE §3), the health-note presets, and the phone helpers that
@@ -15,34 +15,21 @@ export const HONORIFIC_OPTIONS = [
   'Kakek',
 ] as const;
 
-export type Persona = {
-  key: CompanionKey;
-  displayName: string;
-  initials: string;
-  tint: string;
-  tintText: string;
+// Persona = shared companion identity (name + avatar, from lib/companions) plus
+// the wizard-only copy (personality line + greeting preview).
+export type Persona = CompanionMeta & {
   personality: string;
   greeting: (honorific: string) => string;
 };
 
-// Two fixed personas parameterized only by honorific (CORE §3). Avatars are
-// initials on a warm token tint, distinct per persona — no external images.
 export const PERSONAS: Persona[] = [
   {
-    key: 'mbak_asih',
-    displayName: 'Mbak Asih',
-    initials: 'MA',
-    tint: colors.primarySoft,
-    tintText: colors.primary,
+    ...COMPANION_META.mbak_asih,
     personality: 'Penyabar dan penuh perhatian, menemani Eyang dengan lembut setiap hari.',
     greeting: (honorific) => `Selamat pagi, ${honorific}! Sudah sarapan belum?`,
   },
   {
-    key: 'mas_budi',
-    displayName: 'Mas Budi',
-    initials: 'MB',
-    tint: colors.warningSoft,
-    tintText: colors.warning,
+    ...COMPANION_META.mas_budi,
     personality: 'Ramah dan penuh semangat, suka mengajak Eyang ngobrol santai dan bergerak.',
     greeting: (honorific) => `Halo, ${honorific}! Gimana kabarnya hari ini? Sudah gerak-gerak ringan belum?`,
   },
