@@ -43,3 +43,7 @@ docs/superpowers/
 
 # Local session handoff (not published)
 HANDOFF.md
+
+# Agent session continuation artifacts (harness-generated)
+.omo/
+.claude/
