@@ -3,9 +3,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { colors, radii, spacing, typography } from '@/constants/tokens';
 
-// Shared selectable chip for honorific + health notes. Selected = filled
-// primary-soft with primary text and border. 44pt touch target. When `onRemove`
-// is set (custom flags) it renders a remove affordance instead of relying on tap.
+// Shared selectable chip for honorific + health notes + medication time slots.
+// Selected = filled primary-soft with primary text and border. 44pt touch target.
+// When `onRemove` is set (custom flags, time chips) it renders a remove affordance.
 
 type SelectChipProps = {
   label: string;
@@ -16,6 +16,40 @@ type SelectChipProps = {
 };
 
 export function SelectChip({ label, selected, onPress, onRemove, accessibilityHint }: SelectChipProps) {
+  const labelNode = (
+    <Text style={[styles.label, selected && styles.labelSelected]} numberOfLines={1}>
+      {label}
+    </Text>
+  );
+
+  // Removable variant: the chip body and the remove control are SIBLING buttons in
+  // a plain View. Nesting a Pressable (which renders as <button> on web) inside
+  // another is invalid HTML and throws a hydration error, so never nest them.
+  if (onRemove) {
+    return (
+      <View style={[styles.chip, styles.chipRemovable, selected ? styles.chipSelected : styles.chipIdle]}>
+        <Pressable
+          onPress={onPress}
+          accessibilityRole="button"
+          accessibilityState={{ selected }}
+          accessibilityHint={accessibilityHint}
+          style={styles.body}
+        >
+          {labelNode}
+        </Pressable>
+        <Pressable
+          onPress={onRemove}
+          hitSlop={10}
+          accessibilityRole="button"
+          accessibilityLabel={`Hapus ${label}`}
+          style={styles.remove}
+        >
+          <Ionicons name="close-circle" size={18} color={selected ? colors.primary : colors.textMuted} />
+        </Pressable>
+      </View>
+    );
+  }
+
   return (
     <Pressable
       onPress={onPress}
@@ -24,28 +58,13 @@ export function SelectChip({ label, selected, onPress, onRemove, accessibilityHi
       accessibilityHint={accessibilityHint}
       style={({ pressed }) => [
         styles.chip,
+        styles.chipPadded,
         selected ? styles.chipSelected : styles.chipIdle,
         pressed && (selected ? styles.chipSelectedPressed : styles.chipIdlePressed),
       ]}
     >
-      <Text style={[styles.label, selected && styles.labelSelected]} numberOfLines={1}>
-        {label}
-      </Text>
-      {onRemove ? (
-        <Pressable
-          onPress={onRemove}
-          hitSlop={10}
-          accessibilityRole="button"
-          accessibilityLabel={`Hapus ${label}`}
-          style={styles.remove}
-        >
-          <Ionicons
-            name="close-circle"
-            size={18}
-            color={selected ? colors.primary : colors.textMuted}
-          />
-        </Pressable>
-      ) : selected ? (
+      {labelNode}
+      {selected ? (
         <View style={styles.check}>
           <Ionicons name="checkmark" size={16} color={colors.primary} />
         </View>
@@ -60,10 +79,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
     borderRadius: radii.pill,
     borderWidth: 1,
+  },
+  chipPadded: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
+  chipRemovable: {
+    paddingRight: spacing.md,
   },
   chipIdle: {
     backgroundColor: colors.surface,
@@ -79,6 +103,13 @@ const styles = StyleSheet.create({
   chipSelectedPressed: {
     backgroundColor: colors.primarySoftPressed,
   },
+  body: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingLeft: spacing.lg,
+    paddingRight: spacing.sm,
+    paddingVertical: spacing.sm,
+  },
   label: {
     ...typography.body,
     color: colors.text,
@@ -88,7 +119,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   remove: {
-    marginLeft: spacing.xs / 2,
+    minHeight: 44,
+    justifyContent: 'center',
   },
   check: {
     marginLeft: spacing.xs / 2,
