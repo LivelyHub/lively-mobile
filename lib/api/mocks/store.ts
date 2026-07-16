@@ -11,11 +11,13 @@ import type {
   FamilyMember,
   Medication,
   MedicationLog,
+  ProgressResponse,
   TitipanMessage,
   UpdateElderRequest,
   UpdateFamilyMemberRequest,
   UpdateMedicationRequest,
 } from '../types';
+import { computeProgress } from './computeProgress';
 import { MOCK_EMPTY_ACCOUNT } from './config';
 import * as fixtures from './fixtures';
 
@@ -140,13 +142,15 @@ class MockStore {
     return this.titipanByElder.get(elderId) ?? [];
   }
 
-  getProgress(elderId: string) {
-    return {
+  getProgress(elderId: string): ProgressResponse {
+    // Superset per CORE §7: the raw arrays Home reads plus computed chart fields.
+    // computeProgress mirrors the backend's read-time derivation.
+    return computeProgress({
       chair_test_results: this.chairTestsByElder.get(elderId) ?? [],
       exercise_logs: this.exerciseLogsByElder.get(elderId) ?? [],
       medications: this.medicationsByElder.get(elderId) ?? [],
       medication_logs: this.medicationLogsByElder.get(elderId) ?? [],
-    };
+    });
   }
 
   getMedications(elderId: string): Medication[] {

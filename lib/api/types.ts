@@ -180,11 +180,57 @@ export interface AuthResponse {
   family_member: FamilyMember;
 }
 
+// This-week and history dot statuses shared by the streak row and the 30-day strip.
+export type ProgressDayStatus = 'done' | 'missed' | 'future';
+
+export interface ProgressWeekDay {
+  date: string; // YYYY-MM-DD (local calendar)
+  status: ProgressDayStatus;
+}
+
+export interface ChartChairTest {
+  reps: number;
+  recorded_at: string;
+}
+
+export interface ExerciseHistoryDay {
+  date: string; // YYYY-MM-DD
+  completed: boolean;
+}
+
+export interface MedicationAdherence {
+  last7d_taken: number;
+  last7d_scheduled: number;
+  pct: number; // 0-100
+}
+
+export interface MedicationAdherenceTrendDay {
+  date: string; // YYYY-MM-DD
+  taken: number;
+  scheduled: number;
+}
+
+// Superset response (CORE §7). The four raw arrays are kept verbatim so Home's
+// glance rows (components/home/glance.ts) keep working; the rest are computed,
+// chart-ready views the Progress dashboard renders directly.
 export interface ProgressResponse {
+  // Raw arrays (also consumed by Home) — do not remove.
   chair_test_results: ChairTestResult[];
   exercise_logs: ExerciseLog[];
-  medications: Medication[]; // for adherence rollup (P1, lands with backend B6)
+  medications: Medication[];
   medication_logs: MedicationLog[];
+
+  // Computed gamification fields (CORE §7).
+  overall_progress_pct: number; // 0-100, unweighted avg of the three sub-scores
+  engagement_streak_days: number; // consecutive calendar days with any activity
+  exercise: {
+    current_streak_days: number;
+    this_week: ProgressWeekDay[]; // current Mon-Sun week, day dots
+  };
+  chair_tests: ChartChairTest[]; // oldest -> newest, last 20
+  exercise_history: ExerciseHistoryDay[]; // last 30 days, oldest -> newest
+  medication_adherence: MedicationAdherence; // 7-day rollup (P1)
+  medication_adherence_trend: MedicationAdherenceTrendDay[]; // last 30 days (P1)
 }
 
 export interface UpdateFamilyMemberRequest {

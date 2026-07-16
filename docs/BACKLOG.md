@@ -106,12 +106,12 @@ Read-only window into Eyang ↔ companion — sells "there's a real relationship
 ### M5.1 Progress dashboard `P0`
 Where the 8→12 chair-test arc — the demo's clinical proof — renders. Also the gamification screen (CORE.md §7, added post-kickoff per mentor/judge feedback): family-facing progress bar + streak + richer graphs, so checking in reads as a shared win, not a chore. See UI-UX-GUIDELINES.md §1 note on keeping this family-facing, not elder-facing.
 **UI states:** skeleton (chart block + streak row + list rows) · per-section empty (no chair tests → "Tes kursi pertama {honorific} akan muncul di sini" + a one-line explainer) · error + retry · pull-to-refresh.
-- [ ] **Overall progress bar:** single bar/ring from `overall_progress_pct` (0-100), headline number, no numeric target shown to imply a "score to beat" — just "how {honorific} is doing"
-- [ ] **Chair-test chart:** line/area of reps over time (`victory-native` or `react-native-gifted-charts`), dots on points, latest called out ("12 kali — naik dari 8!"); y-axis from 0; ≤2 points → big-number cards instead of a silly 2-point line
-- [ ] **Engagement streak:** `engagement_streak_days` as the headline streak number ("🔥 5 hari berturut-turut"), plus the existing exercise-specific streak + this-week day dots (done/missed/future) below it
-- [ ] **Exercise history graph:** calendar-dot strip from `exercise_history` (last 30 days), same visual language as the streak dots, just longer window
-- [ ] **Medication adherence trend (P1, lands with backend B6):** 7-day ring/bar from `medication_adherence`, plus a 30-day trend line from `medication_adherence_trend` + unconfirmed-today list
-- [ ] Single `GET /elders/:id/progress` fetch → single skeleton, no waterfall
+- [x] **Overall progress bar:** single bar/ring from `overall_progress_pct` (0-100), headline number, no numeric target shown to imply a "score to beat" — just "how {honorific} is doing"
+- [x] **Chair-test chart:** line/area of reps over time (hand-rolled `react-native-svg`), dots on points, latest called out ("12 kali — naik dari 8!"); y-axis from 0; ≤2 points → big-number cards instead of a silly 2-point line
+- [x] **Engagement streak:** `engagement_streak_days` as the headline streak number ("🔥 5 hari berturut-turut" — rendered with an Ionicons flame, not the emoji), plus the existing exercise-specific streak + this-week day dots (done/missed/future) below it
+- [x] **Exercise history graph:** calendar-dot strip from `exercise_history` (last 30 days), same visual language as the streak dots, just longer window
+- [x] **Medication adherence trend (P1, lands with backend B6):** 7-day ring/bar from `medication_adherence`, plus a 30-day trend line from `medication_adherence_trend` + unconfirmed-today list
+- [x] Single `GET /elders/:id/progress` fetch → single skeleton, no waterfall
 
 **Test:** seeded shows 8→12 with callout, progress bar computed correctly, streak matches seed data; fresh elder shows empty explainers and a 0% bar (not an error); curl a new chair test → pull-to-refresh updates chart + bar.
 **Depends on:** M0.3, backend B5.3.

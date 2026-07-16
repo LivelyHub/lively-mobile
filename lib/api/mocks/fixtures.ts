@@ -113,8 +113,14 @@ export function buildChairTestResults(): ChairTestResult[] {
   ];
 }
 
+// A believable 30-day chair-exercise history: a strong recent run (last 10 days)
+// with a scattering of earlier gaps and one full "rest day" 14 days ago. The
+// recent run gives a 10-day exercise streak; the rest day is where the broader
+// engagement streak (14 days, meds keep it alive) still stays intact around it.
+const EXERCISE_DONE_DAYS_AGO = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 15, 16, 18, 19, 21, 22, 24, 25, 27, 28];
+
 export function buildExerciseLogs(): ExerciseLog[] {
-  return [6, 5, 4, 3, 2, 1, 0].map((daysAgo) => ({
+  return EXERCISE_DONE_DAYS_AGO.map((daysAgo) => ({
     id: nextId('exercise'),
     elder_id: ELDER.id,
     completed_at: at(daysAgo, 13, 30),
@@ -154,15 +160,33 @@ export function buildMedications(): Medication[] {
   ];
 }
 
+// 30 days of medication confirmations, mostly-adherent with realistic gaps, so
+// the 7-day adherence rollup and 30-day trend line have believable data. Today
+// (daysAgo 0) is pinned to the demo state Home also shows: Amlodipine confirmed,
+// Metformin morning confirmed but evening still unconfirmed, Vitamin D not yet
+// confirmed. Day 14 is a full rest day (no doses logged), matching the exercise
+// history. Evenings and the supplement are forgotten more often than the morning
+// blood-pressure dose.
 export function buildMedicationLogs(): MedicationLog[] {
-  return [
-    // Amlodipine: confirmed today
-    { id: nextId('medlog'), medication_id: 'med-amlodipine', elder_id: ELDER.id, taken_at: at(0, 7, 10), method: 'reply' },
-    // Metformin: morning dose confirmed, evening dose still unconfirmed today
-    { id: nextId('medlog'), medication_id: 'med-metformin', elder_id: ELDER.id, taken_at: at(0, 7, 12), method: 'reply' },
-    { id: nextId('medlog'), medication_id: 'med-metformin', elder_id: ELDER.id, taken_at: at(1, 19, 5), method: 'emoji' },
-    // Vitamin D: no log today at all (unconfirmed)
-  ];
+  const logs: MedicationLog[] = [];
+  const push = (medicationId: string, daysAgo: number, hour: number, minute: number, method: MedicationLog['method']) => {
+    logs.push({ id: nextId('medlog'), medication_id: medicationId, elder_id: ELDER.id, taken_at: at(daysAgo, hour, minute), method });
+  };
+
+  const amlodipineMissed = new Set([8, 20]);
+  const metforminMorningMissed = new Set([13, 24]);
+  const metforminEveningMissed = new Set([0, 5, 11, 18, 26]);
+
+  for (let d = 0; d <= 29; d += 1) {
+    if (d === 14) continue; // rest day
+    if (!amlodipineMissed.has(d)) push('med-amlodipine', d, 7, 10, 'reply');
+    if (!metforminMorningMissed.has(d)) push('med-metformin', d, 7, 12, 'reply');
+    if (!metforminEveningMissed.has(d)) push('med-metformin', d, 19, 5, 'emoji');
+    // Supplement is taken about half the time and not yet confirmed today.
+    if (d !== 0 && d % 2 === 0) push('med-vitamind', d, 8, 15, 'photo');
+  }
+
+  return logs;
 }
 
 export function buildAlerts(): Alert[] {
