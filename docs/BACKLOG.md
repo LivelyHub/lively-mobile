@@ -59,11 +59,11 @@ No ad-hoc hex or font sizes in screens — everything draws from tokens.
 ### M2.1 Multi-step wizard `P0`
 Where the family "hires" a companion for Eyang — the emotional core of onboarding. 3 steps, progress indicator, back preserves input.
 **UI states:** per-step validation · submit loading (final step) · submit error (retry keeps input) · success moment → Home.
-- [ ] **Step 1 — About Eyang:** name; honorific (chips: Eyang Uti, Eyang Kakung, Oma, Opa, Nenek, Kakek + free text; required — enforces CORE §3 "never a bare first name"); WhatsApp number with `+62` affordance + E.164 validation
-- [ ] **Step 2 — Choose companion:** two large persona cards (Mbak Asih / Mas Budi) with avatar, one-line personality, sample greeting using the entered honorific ("Selamat pagi, Eyang Uti!"); selected card visibly elevated
-- [ ] **Step 3 — Health notes:** multi-select chips (lutut sakit / hipertensi / diabetes / …) + free text; skippable
-- [ ] Confirm screen → `POST /elders` → success moment ("Mbak Asih akan menyapa Eyang Uti besok pagi") → Home
-- [ ] Re-enterable from Home's "+ Tambah Eyang"
+- [x] **Step 1 — About Eyang:** name; honorific (chips: Eyang Uti, Eyang Kakung, Oma, Opa, Nenek, Kakek + free text; required — enforces CORE §3 "never a bare first name"); WhatsApp number with `+62` affordance + E.164 validation
+- [x] **Step 2 — Choose companion:** two large persona cards (Mbak Asih / Mas Budi) with avatar, one-line personality, sample greeting using the entered honorific ("Selamat pagi, Eyang Uti!"); selected card visibly elevated
+- [x] **Step 3 — Health notes:** multi-select chips (lutut sakit / hipertensi / diabetes / …) + free text; skippable
+- [x] Confirm screen → `POST /elders` → success moment ("Mbak Asih akan menyapa Eyang Uti besok pagi") → Home
+- [x] Re-enterable from Home's "+ Tambah Eyang"
 
 **Test:** full flow creates an elder on Home; back-nav keeps input; kill API mid-submit → error state, input intact, retry succeeds.
 **Depends on:** M1.1, backend B3.1.
