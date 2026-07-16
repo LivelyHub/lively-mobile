@@ -38,3 +38,22 @@ export function unconfirmedTodaySlots(
 ): MedSlotStatus[] {
   return todayMedSlots(medications, logs).filter((slot) => !slot.confirmed);
 }
+
+// Medications list (M6.1) per-slot display status. A slot is only "unconfirmed"
+// (past due) once its scheduled time has passed today without a matching log;
+// before that it's "upcoming". Comparing "HH:MM" strings lexicographically is
+// safe because schedule_times are always zero-padded.
+export type MedSlotDisplayStatus = 'taken' | 'upcoming' | 'unconfirmed';
+
+function currentHHMM(): string {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+
+export function slotDisplayStatus(
+  slot: MedSlotStatus,
+  nowHHMM: string = currentHHMM(),
+): MedSlotDisplayStatus {
+  if (slot.confirmed) return 'taken';
+  return slot.time <= nowHHMM ? 'unconfirmed' : 'upcoming';
+}

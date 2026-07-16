@@ -13,6 +13,7 @@ export default function AppLayout() {
           name="setup-wizard"
           options={{ presentation: 'modal', headerShown: true, title: 'Tambah Eyang' }}
         />
+        <Stack.Screen name="medications" options={{ headerShown: true, title: 'Kelola Obat' }} />
         <Stack.Screen
           name="medication-form"
           options={{ presentation: 'modal', headerShown: true, title: 'Obat' }}
