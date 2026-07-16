@@ -30,12 +30,12 @@ No ad-hoc hex or font sizes in screens — everything draws from tokens.
 **Depends on:** M0.1.
 
 ### M0.3 API client + state layer `P0`
-- [ ] Typed API client reading `BACKEND_API_URL` from app config; attaches JWT; maps the backend error shape → typed errors
-- [ ] TanStack Query for all server state (caching, `isLoading`/`isError` per query, refetch-on-focus, pull-to-refresh)
-- [ ] Mock mode `EXPO_PUBLIC_USE_MOCKS=1` serves fixtures matching every endpoint — build all screens offline (venue Wi-Fi risk), swap to real API on Day 2
-- [ ] Offline detection (NetInfo) feeding the offline banner
+- [x] Typed API client reading `BACKEND_API_URL` from app config; attaches JWT; maps the backend error shape → typed errors
+- [x] TanStack Query for all server state (caching, `isLoading`/`isError` per query, refetch-on-focus, pull-to-refresh)
+- [x] Mock mode `EXPO_PUBLIC_USE_MOCKS=1` serves fixtures matching every endpoint — build all screens offline (venue Wi-Fi risk), swap to real API on Day 2
+- [x] Offline detection (NetInfo) feeding the offline banner
 
-**Test:** mock mode renders every screen with zero network; airplane mode → offline banner, cached screens still render.
+**Test:** mock mode renders every screen with zero network; airplane mode → offline banner, cached screens still render. Verified at the data-layer level (`tsc`, `expo export`, mock transport covers every endpoint in lib/api/endpoints.ts); the "every screen" half of this test can only be run once M1+ screens exist and consume these hooks.
 **Depends on:** M0.2.
 
 ---
