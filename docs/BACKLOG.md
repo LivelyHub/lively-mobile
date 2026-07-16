@@ -136,10 +136,10 @@ Where the 8→12 chair-test arc — the demo's clinical proof — renders. Also 
 
 ### M7.1 Send a titipan `P2`
 **UI states:** send loading · send error (text preserved) · success (toast + pending) · delivered state on later poll.
-- [ ] Modal from Home/Chat: explainer ("{companion} akan menyampaikan pesan ini ke {honorific} dengan gayanya sendiri"), multiline input (500 char counter), send button
-- [ ] Sent list with status: "Menunggu disampaikan" → "Sudah disampaikan" (via `delivered_at`)
+- [x] Modal from Home/Chat: explainer ("{companion} akan menyampaikan pesan ini ke {honorific} dengan gayanya sendiri"), multiline input (500 char counter), send button
+- [x] Sent list with status: "Menunggu disampaikan" → "Sudah disampaikan" (via `delivered_at`)
 
-**Test:** send → pending; mark delivered via curl → status flips on next poll; send offline → error, text intact.
+**Test:** send → pending; mark delivered via curl → status flips on next poll; send offline → error, text intact. Ticked on mock-mode equivalence: `tsc` + `expo export` pass; send loading/error(text preserved)/success states verified against the mock transport (which always resolves, so error was exercised by forcing the mutationFn to reject); `useTitipanList` now takes the same `{ refetchInterval }` shape as `useElders`/`useAlerts` and is wired to poll every 15s while the modal is mounted, so a `delivered_at` flip would surface on the next poll. The "mark delivered via curl → flips" half needs the real backend (mock mode has no server-side delivery process) and stays unverified until B8.1 lands.
 **Depends on:** M0.3, backend B8.1.
 
 ---

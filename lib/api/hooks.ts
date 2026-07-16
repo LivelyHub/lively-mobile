@@ -67,11 +67,12 @@ export function useAlerts(options: PollOptions = {}) {
   });
 }
 
-export function useTitipanList(elderId: string) {
+export function useTitipanList(elderId: string, options: PollOptions = {}) {
   return useQuery({
     queryKey: queryKeys.titipan.all(elderId),
     queryFn: () => api.getTitipan(elderId),
     enabled: Boolean(elderId),
+    refetchInterval: options.refetchInterval,
   });
 }
 
