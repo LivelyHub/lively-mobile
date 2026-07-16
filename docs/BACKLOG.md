@@ -13,9 +13,9 @@
 ## Epic M0 — Scaffold & design system `P0`
 
 ### M0.1 Expo app + navigation shell `P0`
-- [ ] Expo (managed) + TypeScript + expo-router; runs in Expo Go on a physical device
-- [ ] Route groups: `(auth)` → login/register; `(app)` tabs: **Home · Chat · Progress · Alerts** + modal stack for setup wizard, medication form, titipan, settings
-- [ ] Deep-link scheme registered (push opens the alert detail)
+- [x] Expo (managed) + TypeScript + expo-router; runs in Expo Go on a physical device
+- [x] Route groups: `(auth)` → login/register; `(app)` tabs: **Home · Chat · Progress · Alerts** + modal stack for setup wizard, medication form, titipan, settings
+- [x] Deep-link scheme registered (push opens the alert detail)
 
 **Test:** cold start < 3s to first screen; tab switching keeps state.
 **Depends on:** nothing.

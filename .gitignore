@@ -18,12 +18,24 @@ build/
 *.p8
 *.p12
 *.mobileprovision
+expo-env.d.ts
+web-build/
+.kotlin/
+*.orig.*
+.metro-health-check*
+/ios
+/android
 
 # OS / editor
 .DS_Store
 *.log
 .idea/
 .vscode/
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
 
 # Local planning artifacts (specs/plans) — kept private during the competition
 docs/superpowers/
