@@ -2,6 +2,7 @@ export { Avatar } from './Avatar';
 export { Banner, type BannerVariant } from './Banner';
 export { Button, type ButtonVariant } from './Button';
 export { Card } from './Card';
+export { ConfirmSheet } from './ConfirmSheet';
 export { EmptyState } from './EmptyState';
 export { ErrorState } from './ErrorState';
 export { Skeleton } from './Skeleton';

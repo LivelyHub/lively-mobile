@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 
-import { Card } from '@/components/ui';
+import { Button, Card } from '@/components/ui';
 import { colors, radii, spacing, typography } from '@/constants/tokens';
 import type {
   MedicationAdherence,
@@ -44,6 +45,12 @@ export function MedicationSection({
         <Text style={styles.emptyText}>
           Belum ada obat. Tambahkan supaya pendamping bisa mengingatkan {honorific} tiap jadwal.
         </Text>
+        <Button
+          label="Kelola obat"
+          variant="ghost"
+          onPress={() => router.push('/medications')}
+          style={styles.manageButton}
+        />
       </Card>
     );
   }
@@ -98,6 +105,13 @@ export function MedicationSection({
           <Text style={styles.allDoneText}>Semua dosis hari ini sudah dikonfirmasi.</Text>
         </View>
       )}
+
+      <Button
+        label="Kelola obat"
+        variant="ghost"
+        onPress={() => router.push('/medications')}
+        style={styles.manageButton}
+      />
     </Card>
   );
 }
@@ -181,5 +195,9 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     ...typography.bodyMuted,
+  },
+  manageButton: {
+    alignSelf: 'flex-end',
+    marginTop: spacing.md,
   },
 });

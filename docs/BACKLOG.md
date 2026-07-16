@@ -122,12 +122,12 @@ Where the 8→12 chair-test arc — the demo's clinical proof — renders. Also 
 
 ### M6.1 Medication list + add/edit form `P1`
 **UI states:** list skeleton (rows) · empty ("Belum ada obat — tambahkan supaya {companion} bisa mengingatkan {honorific}") · form validation · save loading · save error (input intact) · optimistic active-toggle with rollback + toast on failure.
-- [ ] List: name, dosage, schedule chips (07:00 · 19:00), today per-slot status (taken / upcoming / unconfirmed), active toggle
-- [ ] Add/edit form: name, dosage, time picker adding multiple `HH:MM` chips (min 1), active switch
-- [ ] Deactivate = toggle off with confirm sheet ("{companion} akan berhenti mengingatkan obat ini") — no delete
-- [ ] Data: backend B6.1
+- [x] List: name, dosage, schedule chips (07:00 · 19:00), today per-slot status (taken / upcoming / unconfirmed), active toggle
+- [x] Add/edit form: name, dosage, time picker adding multiple `HH:MM` chips (min 1), active switch
+- [x] Deactivate = toggle off with confirm sheet ("{companion} akan berhenti mengingatkan obat ini") — no delete
+- [x] Data: backend B6.1 (mock mode; `/medications` isn't live yet, built against the ANTICIPATED shape in lib/api/types.ts)
 
-**Test:** add med → list shows upcoming slots; toggle off in airplane mode → rolls back with toast; curl a medication-log → slot flips to taken on refresh.
+**Test:** add med → list shows upcoming slots; toggle off in airplane mode → rolls back with toast; curl a medication-log → slot flips to taken on refresh. Ticked on mock-mode equivalence: `tsc` + `expo export` pass, and the optimistic-toggle rollback was traced against the installed `@tanstack/query-core` mutation lifecycle with a forced-failure mutationFn (mock mode itself never rejects, so this is how the rollback path was actually exercised) — restore-then-toast fires in the right order. The "curl a medication-log → slot flips" half needs the real backend and stays unverified until B6.1 lands; `todayMedSlots`/`unconfirmedTodaySlots` already read `medication_logs` from `/progress` the same way the seeded mock data does, so the read path is in place.
 **Depends on:** M0.3, backend B6.1.
 
 ---

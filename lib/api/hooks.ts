@@ -9,6 +9,7 @@ import type {
   CreateMedicationRequest,
   CreateTitipanRequest,
   LoginRequest,
+  Medication,
   RegisterRequest,
   ResolveAlertRequest,
   UpdateElderRequest,
@@ -143,12 +144,32 @@ export function useCreateMedication(elderId: string) {
   });
 }
 
+// Optimistic active-toggle (BACKLOG M6.1): onMutate cancels + snapshots + applies
+// the patch to the cached list immediately (so a Switch flips with no delay),
+// onError rolls the snapshot back, onSettled always reconciles with the server.
+// This same optimistic path also covers the add/edit form's save (name/dosage/
+// schedule_times) since it patches whatever fields are in `body` — callers that
+// want a failure toast (the list's toggle) add their own onError at call time,
+// which fires after this hook's rollback per TanStack Query v5 mutate() ordering.
 export function useUpdateMedication(elderId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ medicationId, body }: { medicationId: string; body: UpdateMedicationRequest }) =>
       api.updateMedication(medicationId, body),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.medications.all(elderId) }),
+    onMutate: async ({ medicationId, body }) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.medications.all(elderId) });
+      const previous = queryClient.getQueryData<Medication[]>(queryKeys.medications.all(elderId));
+      queryClient.setQueryData<Medication[]>(queryKeys.medications.all(elderId), (old) =>
+        old?.map((m) => (m.id === medicationId ? { ...m, ...body } : m)),
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(queryKeys.medications.all(elderId), context.previous);
+      }
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.medications.all(elderId) }),
   });
 }
 
