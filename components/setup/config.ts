@@ -1,4 +1,4 @@
-import type { CompanionKey } from '@/lib/api/types';
+import type { CompanionKey, Religion } from '@/lib/api/types';
 import { COMPANION_META, type CompanionMeta } from '@/lib/companions';
 
 // Static content for the setup wizard (M2.1): the honorific presets, the two
@@ -56,6 +56,54 @@ const HEALTH_LABEL_BY_CODE = new Map<string, string>(HEALTH_PRESETS.map((p) => [
 export function healthFlagLabel(code: string): string {
   return HEALTH_LABEL_BY_CODE.get(code) ?? code;
 }
+
+// Personalization presets (M-personalize): what the companion can use for small
+// talk, what to steer toward, and what to steer away from. Same code/label,
+// verbatim-custom pattern as health flags above.
+export const HOBBY_PRESETS = [
+  { code: 'berkebun', label: 'Berkebun' },
+  { code: 'memasak', label: 'Memasak' },
+  { code: 'menjahit', label: 'Menjahit/merajut' },
+  { code: 'jalan_pagi', label: 'Jalan pagi' },
+  { code: 'menonton_tv', label: 'Menonton TV' },
+  { code: 'mendengarkan_radio', label: 'Mendengarkan radio' },
+  { code: 'momong_cucu', label: 'Momong cucu' },
+  { code: 'mengaji', label: 'Mengaji/ibadah' },
+] as const;
+
+export const TOPIC_PRESETS = [
+  { code: 'cucu', label: 'Cucu' },
+  { code: 'keluarga', label: 'Keluarga' },
+  { code: 'masakan', label: 'Masakan' },
+  { code: 'kenangan_masa_muda', label: 'Kenangan masa muda' },
+  { code: 'tanaman', label: 'Tanaman' },
+  { code: 'berita', label: 'Berita' },
+] as const;
+
+// Sensitive by design: grief/loss and money are the two most common triggers
+// families flag, kept as presets so they don't have to be typed out.
+export const AVOID_TOPIC_PRESETS = [
+  { code: 'almarhum_pasangan', label: 'Almarhum suami/istri' },
+  { code: 'kematian', label: 'Kematian/duka' },
+  { code: 'uang_warisan', label: 'Uang/warisan' },
+  { code: 'penyakit_berat', label: 'Penyakit berat' },
+] as const;
+
+function labelFromPresets(presets: readonly { code: string; label: string }[]) {
+  const byCode = new Map(presets.map((p) => [p.code, p.label]));
+  return (code: string) => byCode.get(code) ?? code;
+}
+
+export const hobbyLabel = labelFromPresets(HOBBY_PRESETS);
+export const topicLabel = labelFromPresets(TOPIC_PRESETS);
+export const avoidTopicLabel = labelFromPresets(AVOID_TOPIC_PRESETS);
+
+export const RELIGION_OPTIONS: { code: Religion; label: string }[] = [
+  { code: 'islam', label: 'Islam' },
+  { code: 'kristen', label: 'Kristen' },
+  { code: 'katolik', label: 'Katolik' },
+  { code: 'lainnya', label: 'Lainnya' },
+];
 
 // Phone: the user types a local number (may start with 0); we compose +62...
 // stripping the leading zero, per the handoff contract.

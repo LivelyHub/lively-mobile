@@ -44,11 +44,15 @@ export function updateElder(elderId: string, body: UpdateElderRequest) {
   return apiRequest<Elder>(`/elders/${elderId}`, { method: 'PATCH', body });
 }
 
-// Conversation
-export function getConversation(elderId: string, query: ConversationQuery = {}) {
-  return apiRequest<ConversationMessage[]>(`/elders/${elderId}/conversation`, {
-    query: query as Record<string, string | number | boolean | undefined>,
-  });
+// Conversation. Backend returns a cursor envelope ({ messages, next_cursor }),
+// not a bare array — unwrapped here so every caller keeps working with
+// ConversationMessage[] and the pagination shape stays an internal detail.
+export async function getConversation(elderId: string, query: ConversationQuery = {}) {
+  const { messages } = await apiRequest<{ messages: ConversationMessage[]; next_cursor: string | null }>(
+    `/elders/${elderId}/conversation`,
+    { query: query as Record<string, string | number | boolean | undefined> },
+  );
+  return messages;
 }
 
 // Titipan
