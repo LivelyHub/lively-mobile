@@ -92,7 +92,7 @@ export function buildConversation(): ConversationMessage[] {
     [0, 7, 5, 'out', 'Obat pagi sudah diminum kan Eyang?'],
     [0, 7, 12, 'in', 'Sudah tadi'],
     [0, 7, 13, 'out', 'Mantap. Nanti siang jangan lupa olahraga kursinya ya'],
-    [0, 10, 30, 'out', 'Titipan dari Dimas: "Sehat-sehat terus ya Bu, minggu depan aku pulang kok"'],
+    [0, 10, 30, 'out', 'Titipan dari Dimas: "Sehat-sehat terus ya Bu, minggu depan aku pulang kok"', true],
   ];
 
   return messages.map(([daysAgo, hour, minute, direction, body, isTitipan]) => ({

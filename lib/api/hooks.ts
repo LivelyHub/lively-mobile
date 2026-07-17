@@ -35,11 +35,16 @@ export function useElders(options: PollOptions = {}) {
   });
 }
 
-export function useConversation(elderId: string, params: ConversationQuery = {}) {
+export function useConversation(
+  elderId: string,
+  params: ConversationQuery = {},
+  options: PollOptions = {},
+) {
   return useQuery({
     queryKey: [...queryKeys.conversation.all(elderId), params],
     queryFn: () => api.getConversation(elderId, params),
     enabled: Boolean(elderId),
+    refetchInterval: options.refetchInterval,
   });
 }
 

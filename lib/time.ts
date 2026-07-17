@@ -37,6 +37,14 @@ export function formatShortDate(iso: string): string {
   return `${d.getDate()} ${MONTHS_ID[d.getMonth()]}`;
 }
 
+// Clock time for grouped chat timestamps, 24h "07.05" (Indonesian convention).
+export function formatClock(iso: string): string {
+  const d = new Date(iso);
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  return `${hh}.${mm}`;
+}
+
 // "Baru saja" / "5 menit lalu" / "2 jam lalu" / "Kemarin" / "3 hari lalu" / "12 Jul".
 export function relativeTime(iso: string): string {
   const then = new Date(iso).getTime();

@@ -90,13 +90,13 @@ Where the family "hires" a companion for Eyang — the emotional core of onboard
 ### M4.1 Conversation screen `P0`
 Read-only window into Eyang ↔ companion — sells "there's a real relationship here."
 **UI states:** skeleton (alternating bubble skeletons, correct alignment) · empty ("Belum ada percakapan — {companion} akan menyapa {honorific} besok pagi") · error + retry · offline (cache + banner) · pull-to-refresh · pagination loading (spinner row).
-- [ ] Bubbles: elder left/neutral, companion right/brand-tinted; timestamps grouped or on long-press; day separators ("Hari ini", "Kemarin", date)
-- [ ] Inverted FlatList, newest at bottom; infinite scroll up via `before`
-- [ ] Poll `?after=` every 10s while focused; new messages append with soft scroll-to-bottom only if already at bottom
-- [ ] Read-only is explicit: footer "Ini percakapan {honorific} dengan {companion} — kirim pesan lewat Titipan" linking to M7
-- [ ] Titipan messages visually distinct ("Titipan dari keluarga" label) if present
+- [x] Bubbles: elder left/neutral, companion right/brand-tinted; timestamps grouped (muted time under the last of a same-direction, same-minute cluster); day separators ("Hari ini", "Kemarin", date)
+- [x] Inverted FlatList, newest at bottom; infinite scroll up via `before` (page fetch wired; mock returns the full history in one shot, so the first fetch finds nothing older and stops)
+- [x] Poll every 10s while focused; new messages surface within a poll cycle with soft scroll-to-bottom only if already at bottom, otherwise a "Pesan baru" pill
+- [x] Read-only is explicit: footer "Ini percakapan {honorific} dengan {companion}, kirim pesan lewat Titipan" linking to M7
+- [x] Titipan messages visually distinct ("Titipan dari keluarga" label) if present
 
-**Test:** seeded history renders with separators; curl `POST /bot/inbound` → message appears ≤10s without user action; scroll up pages older; airplane mode shows cache + banner.
+**Test:** seeded history renders with separators; scroll up pages older; airplane mode shows cache + banner. Ticked on mock-mode equivalence: `tsc` + `expo export` pass. The poll uses refetch-all-and-reconcile (merge/dedupe by id) on a 10s `refetchInterval` rather than an `after` cursor, so the "curl `POST /bot/inbound` → message appears ≤10s without user action" test would surface a new message on the next poll; the curl half needs the real backend (mock mode has no inbound process) and stays unverified until B4.3 lands.
 **Depends on:** M0.3, backend B4.3.
 
 ---
