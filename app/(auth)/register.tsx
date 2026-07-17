@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 
-import { Banner, Button, TextField } from '@/components/ui';
+import { AuthHero, Banner, Button, TextField } from '@/components/ui';
 import { colors, spacing, typography } from '@/constants/tokens';
 import { useIsOffline } from '@/hooks/useIsOffline';
 import { ApiError } from '@/lib/api/errors';
@@ -94,97 +94,97 @@ export default function RegisterScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Daftar</Text>
-          <Text style={styles.subtitle}>Buat akun untuk mulai menemani Eyang.</Text>
-        </View>
+        <AuthHero caption="Buat akun untuk mulai menemani Eyang" />
 
-        {bannerMessage ? <Banner variant="danger" message={bannerMessage} /> : null}
+        <View style={styles.body}>
+          {bannerMessage ? <Banner variant="danger" message={bannerMessage} /> : null}
 
-        <View style={styles.form}>
-          <TextField
-            label="Nama"
-            placeholder="Nama Anda"
-            value={name}
-            onChangeText={(text) => {
-              setName(text);
-              if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
-            }}
-            onBlur={() => setFieldErrors((prev) => ({ ...prev, name: validateName(name) }))}
-            error={fieldErrors.name}
-            autoCapitalize="words"
-            autoComplete="name"
-            textContentType="name"
-            editable={!register.isPending}
-          />
-          <TextField
-            label="Email"
-            placeholder="nama@email.com"
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
-            }}
-            onBlur={() => setFieldErrors((prev) => ({ ...prev, email: validateEmail(email) }))}
-            error={fieldErrors.email}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            autoComplete="email"
-            textContentType="username"
-            editable={!register.isPending}
-          />
-          <TextField
-            label="Kata sandi"
-            placeholder="Minimal 8 karakter"
-            value={password}
-            onChangeText={(text) => {
-              setPassword(text);
-              if (fieldErrors.password) {
-                setFieldErrors((prev) => ({ ...prev, password: undefined }));
+          <View style={styles.form}>
+            <TextField
+              label="Nama"
+              placeholder="Nama Anda"
+              value={name}
+              onChangeText={(text) => {
+                setName(text);
+                if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
+              }}
+              onBlur={() => setFieldErrors((prev) => ({ ...prev, name: validateName(name) }))}
+              error={fieldErrors.name}
+              autoCapitalize="words"
+              autoComplete="name"
+              textContentType="name"
+              editable={!register.isPending}
+            />
+            <TextField
+              label="Email"
+              placeholder="nama@email.com"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+              }}
+              onBlur={() => setFieldErrors((prev) => ({ ...prev, email: validateEmail(email) }))}
+              error={fieldErrors.email}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              autoComplete="email"
+              textContentType="username"
+              editable={!register.isPending}
+            />
+            <TextField
+              label="Kata sandi"
+              placeholder="Minimal 8 karakter"
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                if (fieldErrors.password) {
+                  setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                }
+              }}
+              onBlur={() =>
+                setFieldErrors((prev) => ({ ...prev, password: validatePassword(password) }))
               }
-            }}
-            onBlur={() =>
-              setFieldErrors((prev) => ({ ...prev, password: validatePassword(password) }))
-            }
-            error={fieldErrors.password}
-            secureTextEntry={!showPassword}
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoComplete="password-new"
-            textContentType="newPassword"
-            editable={!register.isPending}
-            rightElement={
-              <Pressable
-                onPress={() => setShowPassword((v) => !v)}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
-              >
-                <Ionicons
-                  name={showPassword ? 'eye-off' : 'eye'}
-                  size={22}
-                  color={colors.textMuted}
-                />
-              </Pressable>
-            }
-          />
+              error={fieldErrors.password}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="password-new"
+              textContentType="newPassword"
+              editable={!register.isPending}
+              rightElement={
+                <Pressable
+                  onPress={() => setShowPassword((v) => !v)}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                >
+                  <Ionicons
+                    name={showPassword ? 'eye-off' : 'eye'}
+                    size={22}
+                    color={colors.textMuted}
+                  />
+                </Pressable>
+              }
+            />
 
-          <Button
-            label="Daftar"
-            onPress={handleSubmit}
-            loading={register.isPending}
-            disabled={isOffline}
-            fullWidth
-            style={styles.submit}
-          />
-        </View>
+            <Button
+              label="Daftar"
+              shape="pill"
+              onPress={handleSubmit}
+              loading={register.isPending}
+              disabled={isOffline}
+              fullWidth
+              style={styles.submit}
+            />
+          </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Sudah punya akun? </Text>
-          <Link href="/login" replace>
-            <Text style={styles.footerLink}>Masuk</Text>
-          </Link>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Sudah punya akun? </Text>
+            <Link href="/login" replace>
+              <Text style={styles.footerLink}>Masuk</Text>
+            </Link>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -198,19 +198,13 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+  },
+  body: {
+    flex: 1,
     paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.xxl,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.xxl,
     gap: spacing.xl,
-  },
-  header: {
-    gap: spacing.sm,
-  },
-  title: {
-    ...typography.title,
-  },
-  subtitle: {
-    ...typography.bodyMuted,
   },
   form: {
     gap: spacing.lg,

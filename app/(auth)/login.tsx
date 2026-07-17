@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 
-import { Banner, Button, TextField } from '@/components/ui';
+import { AuthHero, Banner, Button, TextField } from '@/components/ui';
 import { colors, spacing, typography } from '@/constants/tokens';
 import { useIsOffline } from '@/hooks/useIsOffline';
 import { ApiError } from '@/lib/api/errors';
@@ -88,82 +88,82 @@ export default function LoginScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.header}>
-          <Text style={styles.title}>Masuk</Text>
-          <Text style={styles.subtitle}>Pantau kabar Eyang, di mana pun Anda berada.</Text>
-        </View>
+        <AuthHero caption="Masuk untuk memantau kabar Eyang" />
 
-        {bannerMessage ? <Banner variant="danger" message={bannerMessage} /> : null}
+        <View style={styles.body}>
+          {bannerMessage ? <Banner variant="danger" message={bannerMessage} /> : null}
 
-        <View style={styles.form}>
-          <TextField
-            label="Email"
-            placeholder="nama@email.com"
-            value={email}
-            onChangeText={(text) => {
-              setEmail(text);
-              if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
-            }}
-            onBlur={() => setFieldErrors((prev) => ({ ...prev, email: validateEmail(email) }))}
-            error={fieldErrors.email}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            autoComplete="email"
-            textContentType="username"
-            editable={!login.isPending}
-          />
-          <TextField
-            label="Kata sandi"
-            placeholder="Kata sandi Anda"
-            value={password}
-            onChangeText={(text) => {
-              setPassword(text);
-              if (fieldErrors.password) {
-                setFieldErrors((prev) => ({ ...prev, password: undefined }));
+          <View style={styles.form}>
+            <TextField
+              label="Email"
+              placeholder="nama@email.com"
+              value={email}
+              onChangeText={(text) => {
+                setEmail(text);
+                if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+              }}
+              onBlur={() => setFieldErrors((prev) => ({ ...prev, email: validateEmail(email) }))}
+              error={fieldErrors.email}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              autoComplete="email"
+              textContentType="username"
+              editable={!login.isPending}
+            />
+            <TextField
+              label="Kata sandi"
+              placeholder="Kata sandi Anda"
+              value={password}
+              onChangeText={(text) => {
+                setPassword(text);
+                if (fieldErrors.password) {
+                  setFieldErrors((prev) => ({ ...prev, password: undefined }));
+                }
+              }}
+              onBlur={() =>
+                setFieldErrors((prev) => ({ ...prev, password: validatePassword(password) }))
               }
-            }}
-            onBlur={() =>
-              setFieldErrors((prev) => ({ ...prev, password: validatePassword(password) }))
-            }
-            error={fieldErrors.password}
-            secureTextEntry={!showPassword}
-            autoCapitalize="none"
-            autoCorrect={false}
-            autoComplete="password"
-            textContentType="password"
-            editable={!login.isPending}
-            rightElement={
-              <Pressable
-                onPress={() => setShowPassword((v) => !v)}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
-              >
-                <Ionicons
-                  name={showPassword ? 'eye-off' : 'eye'}
-                  size={22}
-                  color={colors.textMuted}
-                />
-              </Pressable>
-            }
-          />
+              error={fieldErrors.password}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="password"
+              textContentType="password"
+              editable={!login.isPending}
+              rightElement={
+                <Pressable
+                  onPress={() => setShowPassword((v) => !v)}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                >
+                  <Ionicons
+                    name={showPassword ? 'eye-off' : 'eye'}
+                    size={22}
+                    color={colors.textMuted}
+                  />
+                </Pressable>
+              }
+            />
 
-          <Button
-            label="Masuk"
-            onPress={handleSubmit}
-            loading={login.isPending}
-            disabled={isOffline}
-            fullWidth
-            style={styles.submit}
-          />
-        </View>
+            <Button
+              label="Masuk"
+              shape="pill"
+              onPress={handleSubmit}
+              loading={login.isPending}
+              disabled={isOffline}
+              fullWidth
+              style={styles.submit}
+            />
+          </View>
 
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Belum punya akun? </Text>
-          <Link href="/register" replace>
-            <Text style={styles.footerLink}>Daftar</Text>
-          </Link>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Belum punya akun? </Text>
+            <Link href="/register" replace>
+              <Text style={styles.footerLink}>Daftar</Text>
+            </Link>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -177,19 +177,13 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    justifyContent: 'center',
+  },
+  body: {
+    flex: 1,
     paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.xxl,
+    paddingTop: spacing.xl,
+    paddingBottom: spacing.xxl,
     gap: spacing.xl,
-  },
-  header: {
-    gap: spacing.sm,
-  },
-  title: {
-    ...typography.title,
-  },
-  subtitle: {
-    ...typography.bodyMuted,
   },
   form: {
     gap: spacing.lg,

@@ -1,10 +1,12 @@
+import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { colors, radii, spacing, typography } from '@/constants/tokens';
 
-// Warm, understated progress: one segment per step, the active one elongated in
-// primary, completed ones filled short, upcoming ones a calm hairline. No
-// percentage, no numbered "step x of y" stepper — the label names where you are.
+// Warm, understated progress: a connected bar per step, filled left-to-right as
+// steps complete, with a checkmark on finished segments — the wizard's one
+// "Duolingo moment" per DESIGN.md, kept restrained (no numbers, no percentage,
+// no mascot). The label names where you are instead of "step x of y".
 
 type StepIndicatorProps = {
   steps: readonly string[];
@@ -24,14 +26,11 @@ export function StepIndicator({ steps, current }: StepIndicatorProps) {
           const isActive = index === current;
           const isDone = index < current;
           return (
-            <View
-              key={step}
-              style={[
-                styles.segment,
-                isActive && styles.segmentActive,
-                (isActive || isDone) && styles.segmentFilled,
-              ]}
-            />
+            <View key={step} style={[styles.segment, (isActive || isDone) && styles.segmentFilled]}>
+              {isDone ? (
+                <Ionicons name="checkmark" size={12} color={colors.textOnPrimary} />
+              ) : null}
+            </View>
           );
         })}
       </View>
@@ -44,19 +43,18 @@ const styles = StyleSheet.create({
   track: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.xs,
   },
   segment: {
-    height: 6,
-    width: 6,
+    flex: 1,
+    height: 8,
     borderRadius: radii.pill,
     backgroundColor: colors.hairline,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   segmentFilled: {
     backgroundColor: colors.primary,
-  },
-  segmentActive: {
-    width: 28,
   },
   label: {
     ...typography.caption,

@@ -1,5 +1,7 @@
 export { Avatar } from './Avatar';
+export { AuthHero } from './AuthHero';
 export { Banner, type BannerVariant } from './Banner';
+export { BrandMark } from './BrandMark';
 export { Button, type ButtonVariant } from './Button';
 export { Card } from './Card';
 export { ConfirmSheet } from './ConfirmSheet';

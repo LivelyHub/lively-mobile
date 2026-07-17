@@ -13,11 +13,13 @@ import {
 import { colors, radii, spacing, typography } from '@/constants/tokens';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+export type ButtonShape = 'default' | 'pill';
 
 type ButtonProps = {
   label: string;
   onPress?: () => void;
   variant?: ButtonVariant;
+  shape?: ButtonShape;
   loading?: boolean;
   disabled?: boolean;
   fullWidth?: boolean;
@@ -60,6 +62,7 @@ export function Button({
   label,
   onPress,
   variant = 'primary',
+  shape = 'default',
   loading = false,
   disabled = false,
   fullWidth = false,
@@ -98,6 +101,7 @@ export function Button({
         onPressOut={() => animateTo(1)}
         style={({ pressed }) => [
           styles.base,
+          shape === 'pill' && styles.pill,
           {
             backgroundColor: pressed && !isDisabled ? v.backgroundPressed : v.background,
             borderColor: v.borderColor ?? 'transparent',
@@ -136,6 +140,10 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  pill: {
+    minHeight: 56,
+    borderRadius: radii.pill,
   },
   content: {
     flexDirection: 'row',
