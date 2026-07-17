@@ -30,6 +30,7 @@ import {
 } from '@/components/setup/config';
 import { Banner, Button, TextField } from '@/components/ui';
 import { colors, spacing, typography } from '@/constants/tokens';
+import { useRequestPushPermission } from '@/hooks/usePushRegistration';
 import { ApiError } from '@/lib/api/errors';
 import { useCreateElder } from '@/lib/api/hooks';
 import type { CompanionKey } from '@/lib/api/types';
@@ -42,6 +43,7 @@ type FieldErrors = { name?: string; honorific?: string; phone?: string };
 export default function SetupWizardScreen() {
   const insets = useSafeAreaInsets();
   const createElder = useCreateElder();
+  const requestPush = useRequestPushPermission();
 
   // All input lives here so back-nav and edit-jumps preserve everything. Mounting
   // this route fresh (a new push from Home) resets it — the re-entry requirement.
@@ -140,7 +142,13 @@ export default function SetupWizardScreen() {
         phone_e164: composeE164(phone),
       },
       {
-        onSuccess: () => setShowSuccess(true),
+        onSuccess: () => {
+          setShowSuccess(true);
+          // Ask for notification permission now that there's an elder to be
+          // notified about (M8.1) — fire-and-forget so the success moment isn't
+          // blocked; no-ops on web/simulator.
+          void requestPush();
+        },
         onError: (error) => {
           if (error instanceof ApiError && error.fields) {
             const mapped: FieldErrors = {};

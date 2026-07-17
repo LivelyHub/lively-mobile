@@ -11,13 +11,16 @@ import type {
   FamilyMember,
   Medication,
   MedicationLog,
+  PerformanceReport,
   ProgressResponse,
+  ReportPeriod,
   TitipanMessage,
   UpdateElderRequest,
   UpdateFamilyMemberRequest,
   UpdateMedicationRequest,
 } from '../types';
 import { computeProgress } from './computeProgress';
+import { computeReport } from './computeReport';
 import { MOCK_EMPTY_ACCOUNT } from './config';
 import * as fixtures from './fixtures';
 
@@ -151,6 +154,20 @@ class MockStore {
       medications: this.medicationsByElder.get(elderId) ?? [],
       medication_logs: this.medicationLogsByElder.get(elderId) ?? [],
     });
+  }
+
+  getReport(elderId: string, period: ReportPeriod): PerformanceReport {
+    const elder = this.elders.find((e) => e.id === elderId);
+    return computeReport(
+      {
+        chair_test_results: this.chairTestsByElder.get(elderId) ?? [],
+        exercise_logs: this.exerciseLogsByElder.get(elderId) ?? [],
+        medications: this.medicationsByElder.get(elderId) ?? [],
+        medication_logs: this.medicationLogsByElder.get(elderId) ?? [],
+      },
+      period,
+      elder?.honorific ?? 'Eyang',
+    );
   }
 
   getMedications(elderId: string): Medication[] {

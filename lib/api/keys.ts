@@ -14,6 +14,9 @@ export const queryKeys = {
   progress: {
     detail: (elderId: string) => ['progress', elderId] as const,
   },
+  report: {
+    detail: (elderId: string, period: string) => ['report', elderId, period] as const,
+  },
   medications: {
     all: (elderId: string) => ['medications', elderId] as const,
   },

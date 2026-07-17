@@ -2,8 +2,11 @@ import { Stack } from 'expo-router';
 import { View } from 'react-native';
 
 import { OfflineBanner } from '@/components/OfflineBanner';
+import { usePushBootstrap } from '@/hooks/usePushRegistration';
 
 export default function AppLayout() {
+  usePushBootstrap();
+
   return (
     <View style={{ flex: 1 }}>
       <OfflineBanner />
@@ -25,6 +28,14 @@ export default function AppLayout() {
         <Stack.Screen
           name="settings"
           options={{ presentation: 'modal', headerShown: true, title: 'Pengaturan' }}
+        />
+        <Stack.Screen
+          name="alert/[id]"
+          options={{ headerShown: true, title: 'Peringatan' }}
+        />
+        <Stack.Screen
+          name="report"
+          options={{ presentation: 'modal', headerShown: true, title: 'Ringkasan' }}
         />
         <Stack.Screen
           name="gallery"

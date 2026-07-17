@@ -11,8 +11,10 @@ import type {
   FamilyMember,
   LoginRequest,
   Medication,
+  PerformanceReport,
   ProgressResponse,
   RegisterRequest,
+  ReportPeriod,
   ResolveAlertRequest,
   TitipanMessage,
   UpdateElderRequest,
@@ -61,6 +63,11 @@ export function getTitipan(elderId: string) {
 // Progress
 export function getProgress(elderId: string) {
   return apiRequest<ProgressResponse>(`/elders/${elderId}/progress`); // ANTICIPATED
+}
+
+// Performance report (M11.1)
+export function getReport(elderId: string, period: ReportPeriod) {
+  return apiRequest<PerformanceReport>(`/elders/${elderId}/report`, { query: { period } }); // ANTICIPATED
 }
 
 // Medications

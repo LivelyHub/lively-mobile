@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 
 import { Card } from '@/components/ui';
-import { colors, spacing, typography } from '@/constants/tokens';
+import { colors, radii, spacing, typography } from '@/constants/tokens';
 import type { ChartChairTest } from '@/lib/api/types';
 import { formatShortDate } from '@/lib/time';
 import { LineChart } from './LineChart';
@@ -22,6 +22,8 @@ function weeksBetween(fromIso: string, toIso: string): number {
 
 export function ChairTestChart({ chairTests, honorific }: ChairTestChartProps) {
   const [width, setWidth] = useState(0);
+  // Default the tapped detail to the most recent test.
+  const [selectedIndex, setSelectedIndex] = useState(chairTests.length - 1);
   const onLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
 
   const title = 'Tes kursi';
@@ -78,13 +80,19 @@ export function ChairTestChart({ chairTests, honorific }: ChairTestChartProps) {
     );
   }
 
+  const safeIndex = Math.min(Math.max(selectedIndex, 0), chairTests.length - 1);
+  const selected = chairTests[safeIndex];
+
   return (
     <Card>
-      <Text style={styles.title}>{title}</Text>
-      <View style={styles.calloutRow}>
-        <Ionicons name="trending-up" size={20} color={colors.success} />
-        <Text style={styles.callout}>{callout}</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>{title}</Text>
+        <View style={styles.calloutPill}>
+          <Ionicons name="trending-up" size={16} color={colors.success} />
+          <Text style={styles.calloutText}>{callout}</Text>
+        </View>
       </View>
+
       <View
         style={styles.chart}
         onLayout={onLayout}
@@ -93,16 +101,27 @@ export function ChairTestChart({ chairTests, honorific }: ChairTestChartProps) {
       >
         <LineChart
           values={chairTests.map((t) => t.reps)}
-          dotLabels={chairTests.map((t) => String(t.reps))}
+          dotLabels={chairTests.length <= 8 ? chairTests.map((t) => String(t.reps)) : undefined}
           width={width}
-          height={168}
+          height={176}
+          onSelectPoint={setSelectedIndex}
+          selectedIndex={safeIndex}
         />
       </View>
+
       <View style={styles.axisRow}>
         <Text style={styles.axisLabel}>{formatShortDate(first.recorded_at)}</Text>
         <Text style={styles.axisLabel}>{formatShortDate(latest.recorded_at)}</Text>
       </View>
-      <Text style={styles.summary}>{trendSummary}.</Text>
+
+      {/* Tapped-point detail — the "see my details" interaction. */}
+      <View style={styles.detail}>
+        <Ionicons name="ellipse" size={10} color={colors.primary} />
+        <Text style={styles.detailDate}>{formatShortDate(selected.recorded_at)}</Text>
+        <Text style={styles.detailValue}>{selected.reps} kali berdiri</Text>
+      </View>
+
+      <Text style={styles.summary}>{trendSummary}. Ketuk titik untuk lihat detail.</Text>
     </Card>
   );
 }
@@ -110,12 +129,27 @@ export function ChairTestChart({ chairTests, honorific }: ChairTestChartProps) {
 const styles = StyleSheet.create({
   title: {
     ...typography.section,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
     marginBottom: spacing.sm,
   },
-  calloutRow: {
+  calloutPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
+    backgroundColor: colors.successSoft,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radii.pill,
+  },
+  calloutText: {
+    ...typography.caption,
+    color: colors.success,
+    fontWeight: '700',
   },
   callout: {
     ...typography.body,
@@ -123,7 +157,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   chart: {
-    marginTop: spacing.sm,
+    marginTop: spacing.xs,
   },
   axisRow: {
     flexDirection: 'row',
@@ -133,8 +167,28 @@ const styles = StyleSheet.create({
   axisLabel: {
     ...typography.caption,
   },
-  summary: {
+  detail: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+    backgroundColor: colors.background,
+    borderRadius: radii.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    minHeight: 40,
+  },
+  detailDate: {
+    ...typography.body,
+    fontWeight: '600',
+  },
+  detailValue: {
     ...typography.bodyMuted,
+    flex: 1,
+    textAlign: 'right',
+  },
+  summary: {
+    ...typography.caption,
     marginTop: spacing.sm,
   },
   numberRow: {

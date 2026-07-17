@@ -233,6 +233,27 @@ export interface ProgressResponse {
   medication_adherence_trend: MedicationAdherenceTrendDay[]; // last 30 days (P1)
 }
 
+// ---- Performance report (M11.1, CORE §7 `GET /elders/:id/report`) ----
+// ANTICIPATED: derived from the same raw tables as /progress, rolled up over a
+// week or month window. Copy always leads positive; areas_needing_support is
+// rendered as gentle suggestions, never an alarm.
+export type ReportPeriod = 'week' | 'month';
+
+export interface PerformanceReport {
+  period: ReportPeriod;
+  range_start: string; // YYYY-MM-DD (local calendar)
+  range_end: string; // YYYY-MM-DD
+  has_data: boolean; // false -> gentle zero-state, not an error
+  headline: string; // positive-leading summary sentence, honorific interpolated
+  consistency_pct: number; // days with any activity / days in range
+  exercise_completion_pct: number; // exercise days / days in range
+  medication_adherence_pct: number; // taken / scheduled over the range
+  chair_test_latest: number | null; // latest reps in range
+  chair_test_delta: number | null; // reps change across the range (null if <2 tests)
+  highlights: string[]; // positive callouts
+  areas_needing_support: string[]; // gentle suggestions, never alarming
+}
+
 export interface UpdateFamilyMemberRequest {
   push_token?: string;
   name?: string;

@@ -79,6 +79,10 @@ export async function mockRequest<T>(path: string, options: RequestOptions): Pro
   if (method === 'GET' && (params = match('/elders/:id/progress', path))) {
     return mockStore.getProgress(params.id) as unknown as T;
   }
+  if (method === 'GET' && (params = match('/elders/:id/report', path))) {
+    const period = query.period === 'month' ? 'month' : 'week';
+    return mockStore.getReport(params.id, period) as unknown as T;
+  }
   if (method === 'GET' && match('/medications', path)) {
     return mockStore.getMedications(String(query.elder_id ?? '')) as unknown as T;
   }

@@ -109,7 +109,7 @@ Where the 8→12 chair-test arc — the demo's clinical proof — renders. Also 
 - [x] **Overall progress bar:** single bar/ring from `overall_progress_pct` (0-100), headline number, no numeric target shown to imply a "score to beat" — just "how {honorific} is doing"
 - [x] **Chair-test chart:** line/area of reps over time (hand-rolled `react-native-svg`), dots on points, latest called out ("12 kali — naik dari 8!"); y-axis from 0; ≤2 points → big-number cards instead of a silly 2-point line
 - [x] **Engagement streak:** `engagement_streak_days` as the headline streak number ("🔥 5 hari berturut-turut" — rendered with an Ionicons flame, not the emoji), plus the existing exercise-specific streak + this-week day dots (done/missed/future) below it
-- [x] **Exercise history graph:** calendar-dot strip from `exercise_history` (last 30 days), same visual language as the streak dots, just longer window
+- [x] **Exercise history graph:** interactive 30-day **calendar** from `exercise_history` — `components/progress/ExerciseCalendar.tsx`. Redesigned from the flat dot strip into a weekday-aligned month grid (Sen–Min headers, date numbers, done/missed/today states, tap a day → detail line), so it reads unmistakably as "30 days" at a glance and lets the family drill into any day (fitness-app pattern). Verified on the web preview: correct weekday alignment (Kamis 18 → Jumat 17 today), square ~40px cells, no horizontal overflow, tap updates the detail line; every cell is an accessible labeled button.
 - [x] **Medication adherence trend (P1, lands with backend B6):** 7-day ring/bar from `medication_adherence`, plus a 30-day trend line from `medication_adherence_trend` + unconfirmed-today list
 - [x] Single `GET /elders/:id/progress` fetch → single skeleton, no waterfall
 
@@ -147,22 +147,22 @@ Where the 8→12 chair-test arc — the demo's clinical proof — renders. Also 
 ## Epic M8 — Alerts & push `P1`
 
 ### M8.1 Push registration `P1`
-- [ ] Ask notification permission after elder setup succeeds ("Kami kabari kalau ada apa-apa dengan {honorific}"), not on app open
-- [ ] Get Expo push token → `PATCH /family-members/me {push_token}`; re-check on app start
-- [ ] Tapping a push deep-links to the alert detail
-- [ ] Permission denied → dismissible enable-notifications banner on Alerts; app fully functional via polling
+- [x] Ask notification permission after elder setup succeeds ("Kami kabari kalau ada apa-apa dengan {honorific}"), not on app open
+- [x] Get Expo push token → `PATCH /family-members/me {push_token}`; re-check on app start
+- [x] Tapping a push deep-links to the alert detail
+- [x] Permission denied → dismissible enable-notifications banner on Alerts; app fully functional via polling
 
-**Test:** curl an `emergency` alert → push arrives → tap → lands on detail.
+**Test:** curl an `emergency` alert → push arrives → tap → lands on detail. Code-complete: `lib/push.ts` + `hooks/usePushRegistration.ts` (permission prompt fired from the wizard success `onSuccess`, token PATCHed on grant, cold-start token re-check + `getLastNotificationResponseAsync`/`addNotificationResponseReceivedListener` deep-link into `/alert/[id]`, denied → dismissible banner on Alerts via `usePushPermission`). All push helpers no-op on web/simulator (verified: dev server logs the expected "not supported on web" notice, app stays functional via polling). The curl→push→tap loop needs a native dev build + real backend and stays unverified until then; `expo-notifications` added to `app.json` plugins for that build.
 **Depends on:** M1.1, backend B7.2.
 
 ### M8.2 Alerts list + detail `P1`
 **UI states:** skeleton (alert rows) · empty (reassuring — "Tidak ada peringatan. {honorific} baik-baik saja") · error + retry · resolve loading · pull-to-refresh.
-- [ ] List newest-first, unresolved on top; each row: type icon + urgency color (UI-UX §5), headline copy per type, relative time
-- [ ] Type copy — `emergency`: "{honorific} butuh perhatian sekarang"; `pain_mention`: "{honorific} menyebut nyeri"; `no_response`: "{honorific} belum membalas hari ini — mungkin layak ditelepon"; `medication_missed`: "Obat {name} terlewat 2 hari"
-- [ ] Detail: full payload (quoted elder message for pain/dizziness — the family sees Eyang's own words), timestamp, actions: **Telepon {honorific}** (tel: link — the real CTA), **Tandai selesai** (resolve), **Tandai darurat** (escalate, P2)
-- [ ] Resolved section collapsed below
+- [x] List newest-first, unresolved on top; each row: type icon + urgency color (UI-UX §5), headline copy per type, relative time
+- [x] Type copy — `emergency`: "{honorific} butuh perhatian sekarang"; `pain_mention`: "{honorific} menyebut nyeri"; `no_response`: "{honorific} belum membalas hari ini — mungkin layak ditelepon"; `medication_missed`: "Obat {name} terlewat 2 hari"
+- [x] Detail: full payload (quoted elder message for pain/dizziness — the family sees Eyang's own words), timestamp, actions: **Telepon {honorific}** (tel: link — the real CTA), **Tandai selesai** (resolve). Escalate (Tandai darurat) deferred — P2, no backend endpoint yet.
+- [x] Resolved section collapsed below (collapsible "Riwayat selesai (N)")
 
-**Test:** curl each of 6 types → correct copy + color; resolve → moves to resolved; call button opens the dialer with the elder's number.
+**Test:** curl each of 6 types → correct copy + color; resolve → moves to resolved; call button opens the dialer with the elder's number. Verified in mock mode on the web preview: list renders the seeded `pain_mention` (danger tier) on top with the collapsed "Riwayat selesai (1)" section; detail (`/alert/alert-pain`) shows the tier label, Eyang's quoted words, and both actions; `tsc` + `expo export` pass. Resolve uses `useResolveAlert` (invalidates the list) + a success haptic. The curl-each-type and dialer-opens halves need the real backend / a device and stay unverified until then.
 **Depends on:** M0.3, backend B7.3.
 
 ---
@@ -171,12 +171,12 @@ Where the 8→12 chair-test arc — the demo's clinical proof — renders. Also 
 
 ### M9.1 Elder settings `P1`
 **UI states:** per-control save loading · save error with rollback · confirm sheets for consequential switches.
-- [ ] Change honorific (text + chips), switch companion (persona cards + confirm sheet "Ganti ke {other}? Gaya bicaranya akan berubah"), edit health flags
-- [ ] Pause companion: prominent toggle with plain consequence ("{companion} akan berhenti mengirim pesan sampai diaktifkan lagi"); paused elder shows a "Dijeda" chip on Home
-- [ ] Account row: email + logout
-- [ ] All via `PATCH /elders/:id` (backend B3.2)
+- [x] Change honorific (text + chips), switch companion (persona cards + confirm sheet "Ganti ke {other}? Gaya bicaranya akan berubah"), edit health flags
+- [x] Pause companion: prominent toggle with plain consequence ("{companion} akan berhenti mengirim pesan sampai diaktifkan lagi"); paused elder shows a "Dijeda" chip on Home (already in ElderCard)
+- [x] Account row: email + logout
+- [x] All via `PATCH /elders/:id` (backend B3.2)
 
-**Test:** each change persists across restart; pause → Home chip; backend `POST /bot/inbound` for a paused elder returns `paused:true`.
+**Test:** each change persists across restart; pause → Home chip; backend `POST /bot/inbound` for a paused elder returns `paused:true`. Verified in mock mode on the web preview: the screen renders honorific chips + custom field, both persona cards, health-flag chips, the pause switch (correctly unchecked for the unpaused seed), and the account row (email + Keluar). Reached via a new settings gear in the Home header. Each mutation goes through `useUpdateElder`; a save failure restores prior state + toast, and consequential switches (companion, pause-on) gate behind `ConfirmSheet`. Saves fire a selection haptic. `tsc` + `expo export` pass. The "persists across restart" + paused-inbound halves need the real backend and stay unverified until B3.2 lands.
 **Depends on:** M0.3, backend B3.2.
 
 ---
@@ -189,11 +189,13 @@ Day 3 morning. Walk the [UI-UX-GUIDELINES.md](UI-UX-GUIDELINES.md) §2 matrix ag
 - [ ] No raw error strings, no infinite spinners (every fetch times out → error state), no dead-end screens
 - [ ] Copy pass: consistent honorific interpolation everywhere, Indonesian-first tone (UI-UX §4)
 
+> Progress (this pass): the new P1 screens — Alerts list + detail (M8.2), Settings (M9.1), Performance report (M11.1) — were each built to the §2 state matrix (skeleton / empty / error+retry / offline banner / pull-to-refresh where applicable) and their populated + empty-ish paths verified in mock mode on the web preview. Honorific is interpolated throughout. The full device audit (skeleton-on-throttle, 130% font scale, airplane-mode offline, a fresh-eyes demo run) still needs a physical device and remains open.
+
 ### M10.2 Perceived-quality details `P1`
-- [ ] Haptics on: alert arrival, resolve, wizard completion
-- [ ] Press feedback (opacity/scale) on every touchable; min touch target 44pt
-- [ ] Native-stack transitions — no janky custom animation on demo day
-- [ ] Home, Chat, Progress rehearsed on the actual demo device
+- [x] Haptics on: alert arrival (OS push channel — Android `alerts` channel carries a vibration pattern), resolve (alert detail success haptic), wizard completion (SuccessMoment), plus settings saves (selection haptic)
+- [x] Press feedback (opacity/scale) on every touchable; min touch target 44pt (Button scale-spring; AlertRow/calendar cells/report toggle/settings controls all have pressed states; report toggle bumped to 44pt)
+- [x] Native-stack transitions — no janky custom animation (all routes use expo-router native Stack/Tabs defaults; new `/alert/[id]` is a card push, `/report` + `/settings` are native modals)
+- [ ] Home, Chat, Progress rehearsed on the actual demo device — pending a device build (dev/demo has been web-only this pass)
 
 **Test:** the [TESTING.md](TESTING.md) mobile checklist run screen-by-screen on device; a teammate who didn't build it runs the demo script without hitting a broken state.
 **Depends on:** all mobile P0/P1 stories.
@@ -205,12 +207,12 @@ Post-kickoff addition (mentor/judge feedback). A week/month summary card for the
 
 ### M11.1 Performance report card `P1`
 **UI states:** skeleton (headline + 2 stat rows) · empty (gentle zero-state copy, not an error) · error + retry · pull-to-refresh · period toggle (week/month).
-- [ ] Entry point: card on Progress screen ("Lihat ringkasan minggu ini") opening a report view/sheet
-- [ ] Renders `GET /elders/:id/report?period=week|month`: headline, consistency %, exercise completion, medication adherence %, chair-test trend, highlights list, areas-needing-support list
-- [ ] Copy always leads positive (CORE §7); `areas_needing_support` rendered as gentle suggestions, never a red/alarming style — this is encouragement, not the Alerts screen
-- [ ] Week/month toggle refetches with the new `period` param
+- [x] Entry point: card on Progress screen ("Lihat ringkasan minggu ini") opening a report view (modal route `/report`)
+- [x] Renders `GET /elders/:id/report?period=week|month`: headline, consistency %, exercise completion, medication adherence %, chair-test latest+delta, highlights list, areas-needing-support list (ANTICIPATED shape in `types.ts`; mock via `computeReport` mirrors the same read-time derivation the backend will do)
+- [x] Copy always leads positive (CORE §7); `areas_needing_support` rendered as gentle suggestions ("Bisa kita bantu", soft hand icon, primary tint), never a red/alarming style
+- [x] Week/month toggle refetches with the new `period` param (separate query key per period)
 
-**Test:** seeded week → headline + highlights match seed data; fresh elder → zero-state copy, not blank/error; toggle to month → different range, no layout jump.
+**Test:** seeded week → headline + highlights match seed data; fresh elder → zero-state copy, not blank/error; toggle to month → different range, no layout jump. Verified in mock mode on the web preview: seeded week renders "Eyang Uti sangat konsisten minggu ini, aktif 7 dari 7 hari" + Konsistensi 100 / Latihan 100 / Obat 79 tiles + a "Rajin latihan kursi" highlight; `has_data:false` path renders the gentle zero-state instead of an error. `tsc` + `expo export` pass. Real-backend parity waits on `GET /elders/:id/report` landing.
 **Depends on:** M5.1, backend `GET /elders/:id/report`.
 
 ---

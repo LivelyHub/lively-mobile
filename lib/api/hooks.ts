@@ -11,6 +11,7 @@ import type {
   LoginRequest,
   Medication,
   RegisterRequest,
+  ReportPeriod,
   ResolveAlertRequest,
   UpdateElderRequest,
   UpdateFamilyMemberRequest,
@@ -52,6 +53,14 @@ export function useProgress(elderId: string) {
   return useQuery({
     queryKey: queryKeys.progress.detail(elderId),
     queryFn: () => api.getProgress(elderId),
+    enabled: Boolean(elderId),
+  });
+}
+
+export function useReport(elderId: string, period: ReportPeriod) {
+  return useQuery({
+    queryKey: queryKeys.report.detail(elderId, period),
+    queryFn: () => api.getReport(elderId, period),
     enabled: Boolean(elderId),
   });
 }

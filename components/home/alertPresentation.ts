@@ -77,3 +77,40 @@ export function sortAlertsByUrgency(alerts: Alert[]): Alert[] {
     return b.created_at.localeCompare(a.created_at);
   });
 }
+
+// A short human tier label shown on the detail screen next to the icon.
+export const TONE_LABEL: Record<AlertTone, string> = {
+  danger: 'Perlu perhatian segera',
+  warning: 'Sebaiknya diperhatikan',
+  info: 'Sekadar kabar',
+};
+
+// The explanatory line on the alert detail screen: what happened, in plain
+// Indonesian. Quoted elder words (pain/dizziness/emergency) are rendered
+// separately by the detail screen as a blockquote, so this stays contextual.
+export function alertDetailBody(alert: Alert, honorific: string): string {
+  const h = honorific;
+  switch (alert.type) {
+    case 'emergency':
+      return `${h} mengirim pesan yang butuh perhatian segera. Sebaiknya hubungi ${h} sekarang.`;
+    case 'pain_mention':
+      return `${h} menyebut rasa nyeri saat mengobrol dengan pendamping. Mungkin baik untuk menelepon dan menanyakan kabarnya.`;
+    case 'dizziness_mention':
+      return `${h} menyebut rasa pusing saat mengobrol. Menelepon sebentar bisa menenangkan dan memastikan ${h} baik-baik saja.`;
+    case 'medication_missed': {
+      const name = alert.payload.medication_name ?? 'obat';
+      const days = alert.payload.days;
+      return days
+        ? `Obat ${name} belum dikonfirmasi selama ${days} hari terakhir. Pendamping sudah mengingatkan, tapi mungkin perlu diperiksa.`
+        : `Obat ${name} belum dikonfirmasi. Pendamping sudah mengingatkan ${h}.`;
+    }
+    case 'no_response':
+      return `${h} belum membalas sapaan pendamping hari ini. Belum tentu ada apa-apa, tapi menelepon sebentar tidak ada salahnya.`;
+    case 'missed_days': {
+      const days = alert.payload.days ?? 2;
+      return `${h} melewatkan latihan kursi ${days} hari terakhir. Ini hanya catatan ringan, bukan hal yang mendesak.`;
+    }
+    default:
+      return `Ada kabar tentang ${h}.`;
+  }
+}

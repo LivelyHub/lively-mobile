@@ -10,6 +10,7 @@ type BannerProps = {
   variant?: BannerVariant;
   actionLabel?: string;
   onActionPress?: () => void;
+  onDismiss?: () => void;
 };
 
 type BannerStyle = {
@@ -42,7 +43,7 @@ const VARIANTS: Record<BannerVariant, BannerStyle> = {
   },
 };
 
-export function Banner({ message, variant = 'info', actionLabel, onActionPress }: BannerProps) {
+export function Banner({ message, variant = 'info', actionLabel, onActionPress, onDismiss }: BannerProps) {
   const v = VARIANTS[variant];
   return (
     <View style={[styles.container, { backgroundColor: v.background }]}>
@@ -56,6 +57,17 @@ export function Banner({ message, variant = 'info', actionLabel, onActionPress }
           style={({ pressed }) => [styles.action, pressed && styles.actionPressed]}
         >
           <Text style={[styles.actionLabel, { color: v.accent }]}>{actionLabel}</Text>
+        </Pressable>
+      ) : null}
+      {onDismiss ? (
+        <Pressable
+          onPress={onDismiss}
+          accessibilityRole="button"
+          accessibilityLabel="Tutup"
+          hitSlop={8}
+          style={({ pressed }) => [styles.dismiss, pressed && styles.actionPressed]}
+        >
+          <Ionicons name="close" size={18} color={v.accent} />
         </Pressable>
       ) : null}
     </View>
@@ -83,6 +95,12 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: 'center',
     paddingHorizontal: spacing.xs,
+  },
+  dismiss: {
+    minHeight: 44,
+    minWidth: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   actionPressed: {
     opacity: 0.6,

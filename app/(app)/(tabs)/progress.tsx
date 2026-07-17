@@ -6,19 +6,18 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
   ChairTestChart,
-  ExerciseHistory,
+  ExerciseCalendar,
   MedicationSection,
   OverallProgress,
   ProgressSkeleton,
   StreakSection,
 } from '@/components/progress';
-import { Banner, EmptyState, ErrorState, useToast } from '@/components/ui';
+import { Banner, EmptyState, ErrorState } from '@/components/ui';
 import { colors, radii, shadow, spacing, typography } from '@/constants/tokens';
 import { useElders, useProgress } from '@/lib/api/hooks';
 
 export default function ProgressScreen() {
   const insets = useSafeAreaInsets();
-  const toast = useToast();
   const elders = useElders();
   const elder = elders.data?.[0];
   const honorific = elder?.honorific ?? 'Eyang';
@@ -102,7 +101,7 @@ export default function ProgressScreen() {
 
           <ChairTestChart chairTests={data.chair_tests} honorific={honorific} />
 
-          <ExerciseHistory
+          <ExerciseCalendar
             history={data.exercise_history}
             hasExerciseHistory={data.exercise_logs.length > 0}
             honorific={honorific}
@@ -117,10 +116,10 @@ export default function ProgressScreen() {
             honorific={honorific}
           />
 
-          {/* M11 performance-report entry point — stub only, no report screen yet. */}
+          {/* M11.1 performance-report entry point. */}
           <Pressable
             accessibilityRole="button"
-            onPress={() => toast.showToast({ message: 'Ringkasan mingguan segera hadir.' })}
+            onPress={() => router.push('/report')}
             style={({ pressed }) => [styles.reportCard, pressed && styles.reportPressed]}
           >
             <Ionicons name="document-text-outline" size={22} color={colors.primary} />

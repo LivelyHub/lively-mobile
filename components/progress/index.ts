@@ -1,6 +1,6 @@
 export { ChairTestChart } from './ChairTestChart';
 export { DayDots } from './DayDots';
-export { ExerciseHistory } from './ExerciseHistory';
+export { ExerciseCalendar } from './ExerciseCalendar';
 export { LineChart } from './LineChart';
 export { MedicationSection } from './MedicationSection';
 export { OverallProgress } from './OverallProgress';

@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -72,13 +73,24 @@ export default function HomeScreen() {
           <Text style={styles.title}>{greeting}</Text>
           <Text style={styles.subtitle}>Kabar terbaru orang tersayang Anda.</Text>
         </View>
-        {__DEV__ ? (
-          <Link href="/gallery" asChild>
-            <Pressable hitSlop={8} style={({ pressed }) => pressed && styles.devPressed}>
-              <Text style={styles.devLink}>Gallery</Text>
-            </Pressable>
-          </Link>
-        ) : null}
+        <View style={styles.headerActions}>
+          {__DEV__ ? (
+            <Link href="/gallery" asChild>
+              <Pressable hitSlop={8} style={({ pressed }) => pressed && styles.devPressed}>
+                <Text style={styles.devLink}>Gallery</Text>
+              </Pressable>
+            </Link>
+          ) : null}
+          <Pressable
+            onPress={() => router.push('/settings')}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Pengaturan"
+            style={({ pressed }) => [styles.settingsButton, pressed && styles.devPressed]}
+          >
+            <Ionicons name="settings-outline" size={24} color={colors.text} />
+          </Pressable>
+        </View>
       </View>
 
       {elders.isError && elders.data ? (
@@ -165,6 +177,18 @@ const styles = StyleSheet.create({
   headerText: {
     flex: 1,
     gap: spacing.xs,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingTop: spacing.xs,
+  },
+  settingsButton: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     ...typography.title,
