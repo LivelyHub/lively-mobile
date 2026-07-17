@@ -58,32 +58,6 @@ export function ElderCard({ elder }: { elder: Elder }) {
 
       <View style={styles.divider} />
 
-      {progress.data ? (
-        <View style={styles.progressBlock}>
-          <View style={styles.progressHeader}>
-            <Text style={styles.progressLabel}>Progres minggu ini</Text>
-            <Text style={styles.progressPct}>{progress.data.overall_progress_pct}%</Text>
-          </View>
-          <View style={styles.progressTrack}>
-            <View
-              style={[styles.progressFill, { width: `${progress.data.overall_progress_pct}%` }]}
-            />
-          </View>
-          {progress.data.engagement_streak_days > 0 ? (
-            <View style={styles.streakRow}>
-              <Ionicons name="flame" size={16} color={colors.warning} />
-              <Text style={styles.streakText}>
-                {progress.data.engagement_streak_days} hari beruntun
-              </Text>
-            </View>
-          ) : null}
-        </View>
-      ) : (
-        <Skeleton width={'100%'} height={44} radius={radii.sm} />
-      )}
-
-      <View style={styles.divider} />
-
       {glanceRows ? (
         <View>
           {glanceRows.map((row) => (
@@ -160,44 +134,5 @@ const styles = StyleSheet.create({
   },
   grow: {
     flex: 1,
-  },
-  progressBlock: {
-    gap: spacing.xs,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  progressLabel: {
-    ...typography.caption,
-    color: colors.textMuted,
-  },
-  progressPct: {
-    ...typography.caption,
-    color: colors.primary,
-    fontWeight: '700',
-  },
-  progressTrack: {
-    height: 8,
-    borderRadius: radii.pill,
-    backgroundColor: colors.hairline,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    borderRadius: radii.pill,
-    backgroundColor: colors.primary,
-  },
-  streakRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs / 2,
-    marginTop: spacing.xs / 2,
-  },
-  streakText: {
-    ...typography.caption,
-    color: colors.warning,
-    fontWeight: '600',
   },
 });

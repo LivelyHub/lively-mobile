@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { router } from 'expo-router';
-import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -9,9 +9,12 @@ import { TAB_BAR_CLEARANCE } from '@/components/ui/TabBar';
 import { AlertCard } from '@/components/home/AlertCard';
 import { sortAlertsByUrgency } from '@/components/home/alertPresentation';
 import { ElderCard } from '@/components/home/ElderCard';
+import { HomeBanner } from '@/components/home/HomeBanner';
+import { HomeProgressCard } from '@/components/home/HomeProgressCard';
 import { HomeSkeleton } from '@/components/home/HomeSkeleton';
+import { ShortcutRow } from '@/components/home/ShortcutRow';
 import { colors, spacing, typography } from '@/constants/tokens';
-import { useAlerts, useElders, useFamilyMember } from '@/lib/api/hooks';
+import { useAlerts, useElders, useFamilyMember, useProgress } from '@/lib/api/hooks';
 
 const POLL_MS = 60_000; // Home refreshes elders + alerts every 60s while focused (M3.1).
 
@@ -28,6 +31,8 @@ export default function HomeScreen() {
   const elders = useElders({ refetchInterval: POLL_MS });
   const alerts = useAlerts({ refetchInterval: POLL_MS });
   const family = useFamilyMember();
+  const primaryElder = elders.data?.[0];
+  const progress = useProgress(primaryElder?.id ?? '');
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = useCallback(async () => {
@@ -46,6 +51,7 @@ export default function HomeScreen() {
 
   const firstName = family.data?.name?.split(' ')[0];
   const eyebrow = `Selamat ${greetingWord(new Date().getHours())}`;
+  const primaryHonorific = primaryElder?.honorific ?? 'Eyang';
 
   const eldersData = elders.data ?? [];
   const unresolved = alerts.data ? sortAlertsByUrgency(alerts.data.filter((a) => !a.resolved_at)) : [];
@@ -72,6 +78,33 @@ export default function HomeScreen() {
         </View>
         <ProfileMenu name={family.data?.name} />
       </View>
+
+      {!showFirstLoad && !showFullError && primaryElder ? (
+        <HomeBanner honorific={primaryHonorific} onPress={() => router.push('/titipan')} />
+      ) : null}
+
+      {!showFirstLoad && !showFullError && primaryElder ? (
+        <ShortcutRow
+          shortcuts={[
+            { key: 'chat', icon: 'chatbubbles', label: 'Obrolan', onPress: () => router.navigate('/chat') },
+            { key: 'progress', icon: 'trending-up', label: 'Perkembangan', onPress: () => router.navigate('/progress') },
+            { key: 'titipan', icon: 'mail', label: 'Titipan', onPress: () => router.push('/titipan') },
+          ]}
+        />
+      ) : null}
+
+      {!showFirstLoad && !showFullError && primaryElder && progress.data ? (
+        <Pressable onPress={() => router.push('/progress')}>
+          <HomeProgressCard
+            pct={progress.data.overall_progress_pct}
+            engagementStreakDays={progress.data.engagement_streak_days}
+            exerciseStreakDays={progress.data.exercise.current_streak_days}
+            thisWeek={progress.data.exercise.this_week}
+            hasExerciseHistory={progress.data.exercise_logs.length > 0}
+            honorific={primaryHonorific}
+          />
+        </Pressable>
+      ) : null}
 
       {elders.isError && elders.data ? (
         <Banner
