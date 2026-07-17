@@ -13,7 +13,6 @@ import { colors, radii, spacing, typography } from '@/constants/tokens';
 import { useElders, useFamilyMember, useUpdateElder } from '@/lib/api/hooks';
 import type { CompanionKey, Elder } from '@/lib/api/types';
 import { clearToken } from '@/lib/auth/token';
-import { companionKeyFromId } from '@/lib/companions';
 import { queryClient } from '@/lib/query/queryClient';
 
 export default function SettingsScreen() {
@@ -62,7 +61,7 @@ export default function SettingsScreen() {
 function ElderSettings({ elder }: { elder: Elder }) {
   const toast = useToast();
   const update = useUpdateElder(elder.id);
-  const currentCompanion = companionKeyFromId(elder.companion_id);
+  const currentCompanion = elder.companion_key;
 
   const [savingField, setSavingField] = useState<null | 'honorific' | 'health' | 'companion' | 'pause'>(null);
   const [honorific, setHonorific] = useState(elder.honorific);

@@ -33,6 +33,7 @@ medications       (id, elder_id, name, dosage, schedule_times[], active, created
 medication_logs   (id, medication_id, elder_id, taken_at, method['reply'|'emoji'|'photo'])
 alerts            (id, elder_id, type['missed_days'|'pain_mention'|'dizziness_mention'|'medication_missed'|'no_response'|'emergency'], payload, created_at, resolved_at)
 titipan_messages  (id, elder_id, family_member_id, body, delivered_at, created_at)
+bot_contacts      (id, phone_e164[unique], elder_id[nullable], first_seen_at, last_seen_at, message_count)
 ```
 
 ### 2. API contract (Fastify, `lively-backend`)
@@ -52,7 +53,9 @@ titipan_messages  (id, elder_id, family_member_id, body, delivered_at, created_a
 | `POST /elders` | mobile | create elder + pick companion + honorific + health flags |
 | `PATCH /elders/:id` | mobile | switch companion / honorific / health flags / pause |
 | `GET /elders/:id/conversation` | mobile | chat monitor read, `before`/`after` cursor pagination |
-| `POST /bot/inbound` | bot | log inbound WhatsApp message, fetch companion context |
+| `GET /webhook` | meta | WhatsApp Cloud API webhook verification handshake — echoes `hub.challenge` when `hub.verify_token` matches `WHATSAPP_VERIFY_TOKEN` (amendment: hosted here because the backend is the publicly deployed service) |
+| `POST /webhook` | meta | WhatsApp Cloud API message delivery — `X-Hub-Signature-256` verified against `META_APP_SECRET`; inbound texts stored via the same path as `/bot/inbound` (bot_contacts upsert + conversation log). Reply generation is NOT here — still `lively-bot`'s job |
+| `POST /bot/inbound` | bot | log inbound WhatsApp message, fetch companion context; upserts `bot_contacts` for every sender (unknown numbers are recorded, then 404) |
 | `POST /bot/outbound` | bot | log outbound message after send |
 | `POST /assessments/chair-test` | bot | record parsed chair-test result |
 | `POST /exercise-logs` | bot | record daily completion (idempotent per day) |
@@ -133,20 +136,24 @@ The 15-rep and 7-day benchmarks are demo tuning constants, not clinical threshol
 
 **Elder responses carry `companion_key`, not just `companion_id`:** the two companions are fixed personas — mobile resolves display metadata (name/avatar/tint) from a client-side table keyed by `'mbak_asih'|'mas_budi'`, not a server round-trip, so it needs the key, not just an opaque id.
 
-**Performance report** (`GET /elders/:id/report?period=week|month`, family JWT + ownership): a family-facing summary, not an elder-facing one — different audience, different tone. Always lead positive; "areas needing support" is framed as encouragement, never a guilt trip (per the feedback: this should not feel like a burden to check).
+**Performance report** (`GET /elders/:id/report?period=week|month`, family JWT + ownership): a family-facing summary, not an elder-facing one — different audience, different tone. Always lead positive; "areas needing support" is framed as encouragement, never a guilt trip (per the feedback: this should not feel like a burden to check). Copy is Indonesian, matching the rest of the product (an earlier revision of this doc showed an English example and the backend briefly followed it literally — that was the odd one out, not the rest of the app). Shape and algorithm here are mirrored exactly in `lively-mobile/lib/api/mocks/computeReport.ts`, the actual reference implementation both sides now agree on.
 ```json
 {
   "period": "week",
-  "range": {"from": "2026-07-09", "to": "2026-07-16"},
-  "headline": "Eyang Uti had a great week!",
-  "consistency_pct": 86,
-  "exercise": {"completed_days": 6, "total_days": 7},
+  "range_start": "2026-07-11",
+  "range_end": "2026-07-17",
+  "has_data": true,
+  "headline": "Eyang Uti cukup aktif minggu ini, 5 dari 7 hari.",
+  "consistency_pct": 71,
+  "exercise_completion_pct": 57,
   "medication_adherence_pct": 90,
-  "chair_test_trend": "improving",
-  "highlights": ["Exercised 6 of 7 days", "Chair test reps up from 9 to 12"],
-  "areas_needing_support": ["Missed one evening medication dose on Tuesday"]
+  "chair_test_latest": 12,
+  "chair_test_delta": 3,
+  "highlights": ["Tes kursi naik dari 9 ke 12 kali, kekuatan kaki membaik."],
+  "areas_needing_support": []
 }
 ```
+`chair_test_latest`/`chair_test_delta` are numeric (latest reps in range, and the change from first to last — `null` if fewer than 2 chair tests fall in the window), not a categorical trend string. `has_data` is `false` only when zero days in the window have any activity at all — the zero-state headline is still a real string, not an empty one, so mobile can render it directly in the empty state.
 
 ## Config & secrets
 - All secrets via env vars; never committed. Ship `.env.example` only (names, no values).

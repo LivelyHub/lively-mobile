@@ -20,7 +20,7 @@ import { colors, radii, shadow, spacing, typography } from '@/constants/tokens';
 import { getConversation } from '@/lib/api/endpoints';
 import { useConversation, useElders } from '@/lib/api/hooks';
 import type { ConversationMessage } from '@/lib/api/types';
-import { companionMetaFromId } from '@/lib/companions';
+import { companionMetaFromKey } from '@/lib/companions';
 
 const POLL_MS = 10_000; // Chat refetches the full history every 10s while focused (M4.1).
 const OLDER_PAGE = 30; // page size for the older-history `before` cursor.
@@ -39,7 +39,7 @@ export default function ChatScreen() {
   const elders = useElders();
   const elder = elders.data?.[0];
   const honorific = elder?.honorific ?? 'Eyang';
-  const companion = elder ? companionMetaFromId(elder.companion_id) : null;
+  const companion = elder ? companionMetaFromKey(elder.companion_key) : null;
   const companionName = companion?.displayName ?? 'pendamping';
 
   // Poll-all-and-reconcile: fetch the whole history on a 10s interval and merge by
