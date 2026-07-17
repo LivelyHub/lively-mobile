@@ -10,10 +10,8 @@ import { HEALTH_PRESETS, HONORIFIC_OPTIONS, healthFlagLabel, PERSONAS, personaBy
 import { SelectChip } from '@/components/setup/SelectChip';
 import { Avatar, Button, Card, ConfirmSheet, EmptyState, ErrorState, Skeleton, TextField, useToast } from '@/components/ui';
 import { colors, radii, spacing, typography } from '@/constants/tokens';
-import { useElders, useFamilyMember, useUpdateElder } from '@/lib/api/hooks';
+import { useElders, useUpdateElder } from '@/lib/api/hooks';
 import type { CompanionKey, Elder } from '@/lib/api/types';
-import { clearToken } from '@/lib/auth/token';
-import { queryClient } from '@/lib/query/queryClient';
 
 export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
@@ -47,9 +45,6 @@ export default function SettingsScreen() {
             onCtaPress={() => router.replace('/setup-wizard')}
             iconAccessibilityLabel="Belum ada data"
           />
-          <View style={styles.accountStandalone}>
-            <AccountCard />
-          </View>
         </View>
       ) : null}
 
@@ -271,8 +266,6 @@ function ElderSettings({ elder }: { elder: Elder }) {
         </View>
       </Card>
 
-      <AccountCard />
-
       <ConfirmSheet
         visible={pendingCompanion !== null}
         title={pendingCompanion ? `Ganti ke ${personaByKey(pendingCompanion).displayName}?` : ''}
@@ -297,31 +290,6 @@ function ElderSettings({ elder }: { elder: Elder }) {
         loading={savingField === 'pause'}
       />
     </View>
-  );
-}
-
-function AccountCard() {
-  const family = useFamilyMember();
-  const [loggingOut, setLoggingOut] = useState(false);
-
-  const handleLogout = useCallback(async () => {
-    setLoggingOut(true);
-    await clearToken();
-    queryClient.clear();
-    router.replace('/login');
-  }, []);
-
-  return (
-    <Card>
-      <Text style={styles.sectionTitle}>Akun</Text>
-      <View style={styles.accountRow}>
-        <Ionicons name="mail-outline" size={20} color={colors.textMuted} />
-        <Text style={styles.accountEmail} numberOfLines={1}>
-          {family.data?.email ?? '—'}
-        </Text>
-      </View>
-      <Button label="Keluar" variant="danger" onPress={handleLogout} loading={loggingOut} style={styles.saveButton} />
-    </Card>
   );
 }
 
@@ -369,9 +337,6 @@ const styles = StyleSheet.create({
   },
   centerBlock: {
     paddingTop: spacing.lg,
-  },
-  accountStandalone: {
-    marginTop: spacing.lg,
   },
   stack: {
     gap: spacing.lg,
@@ -441,17 +406,6 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   pauseText: {
-    flex: 1,
-  },
-  accountRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.md,
-    marginBottom: spacing.xs,
-  },
-  accountEmail: {
-    ...typography.body,
     flex: 1,
   },
   grow: {

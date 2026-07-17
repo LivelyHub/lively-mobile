@@ -16,7 +16,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
           // Same cream as constants/tokens#colors.background — kept as a literal
           // since this file renders before any RN styling exists to import from.
           dangerouslySetInnerHTML={{
-            __html: `html,body{overscroll-behavior:none;background-color:#FBF6F1;}`,
+            __html: `html,body{overscroll-behavior:none;background-color:#FDFCFB;}`,
           }}
         />
       </head>

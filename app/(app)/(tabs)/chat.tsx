@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Avatar, Banner, EmptyState, ErrorState } from '@/components/ui';
+import { TAB_BAR_CLEARANCE } from '@/components/ui/TabBar';
 import { buildChatItems, ChatSkeleton, DaySeparator, MessageBubble, type ChatItem } from '@/components/chat';
 import { colors, radii, shadow, spacing, typography } from '@/constants/tokens';
 import { getConversation } from '@/lib/api/endpoints';
@@ -125,7 +126,7 @@ export default function ChatScreen() {
     setIsLoadingOlder(true);
     try {
       const older = await getConversation(elder.id, {
-        before: oldest.created_at,
+        before: oldest.id,
         limit: OLDER_PAGE,
       });
       if (older.length === 0) {
@@ -174,7 +175,9 @@ export default function ChatScreen() {
       <View style={styles.header}>
         {elder && companion ? (
           <>
-            <Avatar initials={companion.initials} tint={companion.tint} tintText={companion.tintText} size={44} />
+            <View style={styles.avatarRing}>
+              <Avatar initials={companion.initials} tint={companion.tint} tintText={companion.tintText} size={44} />
+            </View>
             <View style={styles.headerText}>
               <Text style={styles.headerTitle}>Obrolan {honorific}</Text>
               <Text style={styles.headerSub}>bersama {companionName}</Text>
@@ -196,7 +199,7 @@ export default function ChatScreen() {
         </View>
       ) : null}
 
-      <View style={styles.body}>
+      <View style={[styles.body, !elder && styles.bodyNoFooter]}>
         {showSkeleton ? (
           <ChatSkeleton />
         ) : eldersError ? (
@@ -228,7 +231,7 @@ export default function ChatScreen() {
             />
           </View>
         ) : showList ? (
-          <View style={styles.listWrap}>
+          <View style={[styles.listWrap, styles.listCard]}>
             <FlatList
               ref={listRef}
               data={items}
@@ -298,6 +301,11 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     paddingBottom: spacing.md,
   },
+  avatarRing: {
+    borderRadius: radii.pill,
+    borderWidth: 2,
+    borderColor: colors.primarySoft,
+  },
   headerText: {
     flex: 1,
     gap: spacing.xs / 2,
@@ -314,6 +322,11 @@ const styles = StyleSheet.create({
   },
   body: {
     flex: 1,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.sm,
+  },
+  bodyNoFooter: {
+    paddingBottom: TAB_BAR_CLEARANCE,
   },
   centerBlock: {
     flex: 1,
@@ -322,8 +335,14 @@ const styles = StyleSheet.create({
   listWrap: {
     flex: 1,
   },
+  listCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.card,
+    overflow: 'hidden',
+    ...shadow.card,
+  },
   listContent: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
   },
   paginationRow: {
@@ -355,12 +374,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.xs,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.md,
-    borderTopWidth: 1,
-    borderTopColor: colors.hairline,
-    backgroundColor: colors.surface,
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.sm,
+    marginBottom: TAB_BAR_CLEARANCE,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: radii.card,
+    backgroundColor: colors.surfaceMuted,
   },
   footerIcon: {
     marginTop: 1,

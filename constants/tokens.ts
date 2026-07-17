@@ -5,24 +5,29 @@ import type { TextStyle, ViewStyle } from 'react-native';
 // Structured so dark mode is a palette swap: components read `colors.*`, never raw hex.
 
 // Raw hex lives only here. Contrast ratios (WCAG) noted where a pair carries text:
-//   text     #2E2A28 on background #FBF6F1 = 13.2:1
-//   textMuted #6E6560 on background #FBF6F1 =  5.3:1  (on surface #FFFFFF = 5.7:1)
+//   text     #2E2A28 on background #FDFCFB = 13.5:1
+//   textMuted #6E6560 on background #FDFCFB =  5.4:1  (on surface #FFFFFF = 5.7:1)
 //   white     #FFFFFF on primary    #B8543A =  4.7:1  (button label)
-//   primary   #B8543A on background #FBF6F1 =  ~4.9:1
+//   primary   #B8543A on background #FDFCFB =  ~4.9:1
 //   white     #FFFFFF on danger     #C4362B =  5.4:1
-//   danger    #C4362B on background #FBF6F1 =  5.0:1
-//   warning   #8A5A0C on background #FBF6F1 =  5.5:1
-//   success   #2F7D4F on background #FBF6F1 =  4.7:1  (white on success = 5.0:1)
+//   danger    #C4362B on background #FDFCFB =  5.0:1
+//   warning   #8A5A0C on background #FDFCFB =  5.5:1
+//   success   #2F7D4F on background #FDFCFB =  4.7:1  (white on success = 5.0:1)
+//   white     #FFFFFF on tabBarBg  #241B16 = 15.8:1  (icon-only, decorative use)
 const palette = {
   terracotta: '#B8543A',
   terracottaPressed: '#9C4630',
   terracottaSoft: '#F7E4DB',
   terracottaSoftPressed: '#EFD4C7',
 
-  offWhite: '#FBF6F1',
+  // "Clean white" reads as bright, not warm-cream: background carries only a
+  // whisper of tint (never bare #FFF per design-law) and surfaces sit at true
+  // white, separated by hairline + the single card shadow instead of a color step.
+  paperWhite: '#FDFCFB',
   white: '#FFFFFF',
-  hairline: '#E8DED6',
-  border: '#E4DAD2',
+  surfaceMuted: '#F6F3EF', // tonal panel: header strip, quick-action tiles, chip rest state
+  hairline: '#ECE7E1',
+  border: '#E3DDD4',
 
   ink: '#2E2A28',
   inkMuted: '#6E6560',
@@ -38,6 +43,11 @@ const palette = {
   redSoft: '#F7DED9',
 
   shadowWarm: '#6B4A34',
+
+  // Floating pill tab bar: near-black warm dark (not bare #000) so the one
+  // dark surface in an otherwise white app still belongs to the terracotta family.
+  tabBarBg: '#241B16',
+  tabBarIconInactive: 'rgba(255, 255, 255, 0.5)',
 };
 
 export const colors = {
@@ -47,8 +57,9 @@ export const colors = {
   primarySoftPressed: palette.terracottaSoftPressed,
   textOnPrimary: palette.white,
 
-  background: palette.offWhite,
+  background: palette.paperWhite,
   surface: palette.white,
+  surfaceMuted: palette.surfaceMuted,
   border: palette.border,
   hairline: palette.hairline,
 
@@ -66,6 +77,11 @@ export const colors = {
   dangerSoft: palette.redSoft,
 
   overlay: 'rgba(46, 42, 40, 0.45)',
+
+  tabBarBg: palette.tabBarBg,
+  tabBarIconActive: palette.white,
+  tabBarIconInactive: palette.tabBarIconInactive,
+  tabBarActiveDot: palette.terracotta,
 } as const;
 
 export const spacing = {

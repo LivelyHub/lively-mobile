@@ -13,6 +13,7 @@ import {
   StreakSection,
 } from '@/components/progress';
 import { Banner, EmptyState, ErrorState } from '@/components/ui';
+import { TAB_BAR_CLEARANCE } from '@/components/ui/TabBar';
 import { colors, radii, shadow, spacing, typography } from '@/constants/tokens';
 import { useElders, useProgress } from '@/lib/api/hooks';
 
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
+    paddingBottom: TAB_BAR_CLEARANCE,
     gap: spacing.lg,
   },
   title: {

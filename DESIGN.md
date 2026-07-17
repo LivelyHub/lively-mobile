@@ -6,10 +6,12 @@ colors:
   terracotta-pressed: "#9C4630"
   terracotta-soft: "#F7E4DB"
   terracotta-soft-pressed: "#EFD4C7"
-  warm-cream: "#FBF6F1"
+  paper-white: "#FDFCFB"
   surface-white: "#FFFFFF"
-  hairline: "#E8DED6"
-  border: "#E4DAD2"
+  surface-muted: "#F6F3EF"
+  hairline: "#ECE7E1"
+  border: "#E3DDD4"
+  tab-bar-bg: "#241B16"
   ink: "#2E2A28"
   ink-muted: "#6E6560"
   success-green: "#2F7D4F"
@@ -99,15 +101,16 @@ Every screen should feel like a quick, caring glance at how Eyang (the parent) i
 This system explicitly rejects: the flat gray "unstyled admin panel" look, cluttered dashboards that cram every stat onto one screen with no breathing room, and childish/toy-like gamification (cartoon mascots, loud primary colors, confetti overload). Warmth comes from the terracotta-on-cream palette and soft rounded surfaces, not from cuteness — this is a health product for someone's parent, and every playful element must still read as credible.
 
 **Key Characteristics:**
-- Warm cream backgrounds with a single confident terracotta accent, not a rainbow of competing brand colors
+- Clean white surfaces with a single confident terracotta accent, not a rainbow of competing brand colors
 - Rounded, soft-edged surfaces (12–18px radii) that feel touchable and gentle, never sharp or clinical
-- One restrained shadow level for cards; flat everywhere else — depth is used sparingly, not decoratively
+- Cards float a shade lighter than the page on shadow + hairline alone, not a color step — depth is used sparingly, not decoratively
+- One dark surface in the whole app: the floating icon-only tab bar, which keeps the terracotta-family dark rather than bare black
 - Status color (green/amber/red) reserved strictly for meaning (adherence, warnings, alerts), never for decoration
 - Generous whitespace between sections — one clear signal per screen, not a wall of stat tiles
 
 ## 2. Colors
 
-Warm, terracotta-on-cream palette carried over from the existing token system — it already reads as the calm pastel-wellness tone this product needs, so it's refined and extended rather than replaced.
+White-forward palette with terracotta as the one carried-over accent — the warm-cream background was traded for a barely-tinted white so the app reads as "clean," while terracotta keeps doing all the same brand-identity work it always did.
 
 ### Primary
 - **Terracotta** (#B8543A): the single confident accent — primary buttons, active tab state, key progress indicators (streak flame, chair-test highlight). Used deliberately, not sprinkled everywhere.
@@ -116,12 +119,14 @@ Warm, terracotta-on-cream palette carried over from the existing token system �
 - **Terracotta Soft Pressed** (#EFD4C7): pressed state for soft-terracotta surfaces.
 
 ### Neutral
-- **Warm Cream** (#FBF6F1): the app's background — never pure white, always warm.
-- **Surface White** (#FFFFFF): elevated surfaces — cards, sheets, inputs — sit one step lighter than the cream background.
-- **Hairline** (#E8DED6): 1px dividers between list rows and sections.
-- **Border** (#E4DAD2): input and outline borders.
-- **Ink** (#2E2A28): primary text (13.2:1 on cream — well past WCAG AA).
-- **Ink Muted** (#6E6560): secondary/caption text (5.3:1 on cream).
+- **Paper White** (#FDFCFB): the app's background — a whisper of warm tint, never bare #FFF, but reads as "clean white" at a glance.
+- **Surface White** (#FFFFFF): elevated surfaces — cards, sheets, inputs — separated from the page by hairline + the single card shadow, not a color step.
+- **Surface Muted** (#F6F3EF): tonal panel one step warmer than surface-white — header strips, quick-action tiles, the chat disclosure note.
+- **Hairline** (#ECE7E1): 1px dividers between list rows and sections.
+- **Border** (#E3DDD4): input and outline borders.
+- **Tab Bar Background** (#241B16): the one dark surface — near-black but tinted into the terracotta family, never bare #000.
+- **Ink** (#2E2A28): primary text (13.5:1 on paper-white — well past WCAG AA).
+- **Ink Muted** (#6E6560): secondary/caption text (5.4:1 on paper-white).
 
 ### Status (meaning-only, never decorative)
 - **Success Green** (#2F7D4F) / **Success Green Soft** (#E4F0E8): medication taken, streak maintained, chair-test improvement.
@@ -152,7 +157,7 @@ Warm, terracotta-on-cream palette carried over from the existing token system �
 
 ## 4. Elevation
 
-Restrained and flat by default. The app uses exactly one shadow level — a soft, warm-toned shadow reserved for cards — and nothing else. No glassmorphism, no floating glass panels, no layered blur effects. Depth exists only to lift a card off the cream background just enough to read as tappable; it is never used decoratively or to fake a 3D "premium" surface.
+Restrained and flat by default. The app uses exactly one shadow level — a soft, warm-toned shadow reserved for cards — and nothing else. No glassmorphism, no floating glass panels, no layered blur effects. On a white-on-white page, this shadow (plus the hairline) is what separates a card from the background instead of a color step; it is never used decoratively or to fake a 3D "premium" surface. The floating tab bar reuses the same shadow at a slightly higher opacity/radius since it's the one element meant to visibly hover over content.
 
 ### Shadow Vocabulary
 - **Card** (`shadowColor: #6B4A34, shadowOffset: 0/2, shadowOpacity: 0.12, shadowRadius: 8, elevation: 2`): the only shadow in the system. Applies to Card and any card-derived surface (progress tiles, alert rows treated as cards).
@@ -172,7 +177,7 @@ Restrained and flat by default. The app uses exactly one shadow level — a soft
 
 ### Cards
 - **Corner Style:** 16px radius (rounded.card) — noticeably softer than buttons, reinforcing that cards are a resting surface, not an interactive control.
-- **Background:** surface-white, always sitting one step lighter than the warm-cream page background.
+- **Background:** surface-white on paper-white page — separated by hairline + shadow, not a color step, since both are "white."
 - **Shadow Strategy:** the single Card shadow (§4), applied uniformly — no per-card shadow variation.
 - **Internal Padding:** 16px default (spacing.lg), configurable per instance; never edge-to-edge content.
 
@@ -185,7 +190,9 @@ Restrained and flat by default. The app uses exactly one shadow level — a soft
 - **Focus:** border shifts to terracotta, no glow or shadow added — focus is communicated by color, staying consistent with the flat-elevation philosophy.
 
 ### Navigation
-- Bottom tab bar, native iOS conventions: active tab uses terracotta icon + label, inactive uses ink-muted. No custom tab bar chrome — this is where "feels like a real iOS app" matters most.
+- **Floating pill tab bar:** icon-only, no labels — 4 destinations is few enough that shape alone reads. A rounded pill in `tab-bar-bg` floats above content with generous bottom margin (clears the home indicator via safe-area inset).
+- **Active state:** icon sits in a small terracotta-filled circle, white glyph on top. Inactive icons are white at 50% opacity on the dark pill — no labels, no underline.
+- **Screen clearance:** every tab screen must reserve `TAB_BAR_CLEARANCE` (`components/ui/TabBar.tsx`) worth of bottom space so content and any floating in-screen elements (e.g. the chat disclosure note) never sit behind the pill.
 
 ### Streak / Progress Ring (signature component)
 The engagement streak and chair-test progress use a single terracotta ring/bar on a terracotta-soft track — same accent-on-soft-tint logic as buttons, so the gamification layer never introduces a new color language. A short flame or check-mark glyph (not a cartoon mascot) marks an active streak day. This is the product's one "Duolingo moment" — keep it exactly this restrained; do not let it multiply into a second gamified visual system elsewhere in the app.
@@ -198,9 +205,12 @@ The engagement streak and chair-test progress use a single terracotta ring/bar o
 - **Do** reserve danger-red strictly for genuine health alerts (pain/dizziness, emergency, no-response escalation) so the color keeps its urgency.
 - **Do** keep the streak/progress ring as the one gamified visual motif — one signature moment, not a mascot-driven system.
 - **Do** honor generous whitespace between sections; one clear signal per screen over a wall of stat tiles.
+- **Do** let hairline + the card shadow do the separating on white-on-white surfaces; reach for `surface-muted` only when a panel needs to read as a distinct tonal zone (header strip, disclosure note), not as a default card background.
+- **Do** give every tab screen `TAB_BAR_CLEARANCE` of bottom padding so nothing sits behind the floating pill.
 
 ### Don't:
 - **Don't** default to the flat gray "unstyled admin panel" look — no default Material blue, no ungrouped flat list rows.
+- **Don't** use bare `#FFFFFF` for the page background or bare `#000000` for the tab bar — both stay tinted into the terracotta family (`paper-white`, `tab-bar-bg`).
 - **Don't** cram multiple stat cards onto one screen with no breathing room — this is explicitly what the current UI does wrong today.
 - **Don't** use cartoon mascots, loud primary colors, or confetti-style celebration — playful, never juvenile.
 - **Don't** introduce glassmorphism, layered blur, or floating glass cards — elevation stays flat-by-default with one soft shadow only.

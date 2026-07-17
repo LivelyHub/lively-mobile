@@ -38,8 +38,8 @@ export default function AppLayout() {
           options={{ presentation: 'modal', headerShown: true, title: 'Ringkasan' }}
         />
         <Stack.Screen
-          name="gallery"
-          options={{ headerShown: true, title: 'Component Gallery' }}
+          name="profile"
+          options={{ presentation: 'modal', headerShown: true, title: 'Profil' }}
         />
       </Stack>
     </View>

@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import { Link, router } from 'expo-router';
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
+import { RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { Banner, Button, EmptyState, ErrorState } from '@/components/ui';
+import { Banner, Button, EmptyState, ErrorState, ProfileMenu } from '@/components/ui';
+import { TAB_BAR_CLEARANCE } from '@/components/ui/TabBar';
 import { AlertCard } from '@/components/home/AlertCard';
 import { sortAlertsByUrgency } from '@/components/home/alertPresentation';
 import { ElderCard } from '@/components/home/ElderCard';
@@ -46,9 +46,7 @@ export default function HomeScreen() {
   }, [elders, alerts, queryClient]);
 
   const firstName = family.data?.name?.split(' ')[0];
-  const greeting = firstName
-    ? `Selamat ${greetingWord(new Date().getHours())}, ${firstName}`
-    : `Selamat ${greetingWord(new Date().getHours())}`;
+  const eyebrow = `Selamat ${greetingWord(new Date().getHours())}`;
 
   const eldersData = elders.data ?? [];
   const unresolved = alerts.data ? sortAlertsByUrgency(alerts.data.filter((a) => !a.resolved_at)) : [];
@@ -70,28 +68,19 @@ export default function HomeScreen() {
     >
       <View style={styles.header}>
         <View style={styles.headerText}>
-          <Text style={styles.title}>{greeting}</Text>
-          <Text style={styles.subtitle}>Kabar terbaru orang tersayang Anda.</Text>
+          <Text style={styles.eyebrow}>{eyebrow}</Text>
+          <Text style={styles.headline}>{firstName ?? 'Keluarga'}</Text>
         </View>
-        <View style={styles.headerActions}>
-          {__DEV__ ? (
-            <Link href="/gallery" asChild>
-              <Pressable hitSlop={8} style={({ pressed }) => pressed && styles.devPressed}>
-                <Text style={styles.devLink}>Gallery</Text>
-              </Pressable>
-            </Link>
-          ) : null}
-          <Pressable
-            onPress={() => router.push('/settings')}
-            hitSlop={8}
-            accessibilityRole="button"
-            accessibilityLabel="Pengaturan"
-            style={({ pressed }) => [styles.settingsButton, pressed && styles.devPressed]}
-          >
-            <Ionicons name="settings-outline" size={24} color={colors.text} />
-          </Pressable>
-        </View>
+        <ProfileMenu name={family.data?.name} />
       </View>
+
+      {!showFirstLoad && !showFullError && eldersData.length > 0 ? (
+        <QuickActions
+          onChat={() => router.navigate('/chat')}
+          onProgress={() => router.navigate('/progress')}
+          onTitipan={() => router.push('/titipan')}
+        />
+      ) : null}
 
       {elders.isError && elders.data ? (
         <Banner
@@ -143,15 +132,6 @@ export default function HomeScreen() {
             variant="secondary"
             onPress={() => router.push('/setup-wizard')}
           />
-
-          <View style={styles.actions}>
-            <Text style={styles.sectionLabel}>Aksi cepat</Text>
-            <QuickActions
-              onChat={() => router.navigate('/chat')}
-              onProgress={() => router.navigate('/progress')}
-              onTitipan={() => router.push('/titipan')}
-            />
-          </View>
         </View>
       ) : null}
     </ScrollView>
@@ -165,54 +145,35 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
+    paddingBottom: TAB_BAR_CLEARANCE,
     gap: spacing.lg,
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.md,
   },
   headerText: {
     flex: 1,
-    gap: spacing.xs,
+    gap: spacing.xs / 2,
   },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    paddingTop: spacing.xs,
-  },
-  settingsButton: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    ...typography.title,
-  },
-  subtitle: {
-    ...typography.bodyMuted,
-  },
-  devLink: {
+  eyebrow: {
     ...typography.caption,
     color: colors.textMuted,
+    letterSpacing: 0.3,
   },
-  devPressed: {
-    opacity: 0.5,
+  headline: {
+    fontSize: 32,
+    fontWeight: '800',
+    letterSpacing: -0.5,
+    lineHeight: 38,
+    color: colors.text,
   },
   centerBlock: {
     paddingTop: spacing.xl,
   },
   stack: {
     gap: spacing.lg,
-  },
-  actions: {
-    gap: spacing.md,
-  },
-  sectionLabel: {
-    ...typography.section,
   },
 });
