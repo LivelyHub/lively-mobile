@@ -53,6 +53,7 @@ export const ELDER: Elder = {
   name: 'Sumarni',
   honorific: 'Eyang Uti',
   companion_id: 'companion-mbak-asih',
+  companion_key: 'mbak_asih',
   health_flags: ['knee_pain', 'hypertension'],
   phone_e164: '+6281234567890',
   created_at: at(60, 9, 0),

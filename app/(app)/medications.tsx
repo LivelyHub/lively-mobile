@@ -8,7 +8,7 @@ import { Banner, Button, ConfirmSheet, EmptyState, ErrorState, useToast } from '
 import { colors, spacing } from '@/constants/tokens';
 import { useElders, useMedications, useProgress, useUpdateMedication } from '@/lib/api/hooks';
 import type { Medication } from '@/lib/api/types';
-import { companionMetaFromId } from '@/lib/companions';
+import { companionMetaFromKey } from '@/lib/companions';
 import { todayMedSlots } from '@/lib/medications';
 
 export default function MedicationsScreen() {
@@ -17,7 +17,7 @@ export default function MedicationsScreen() {
   const elders = useElders();
   const elder = elders.data?.[0];
   const honorific = elder?.honorific ?? 'Eyang';
-  const companion = elder ? companionMetaFromId(elder.companion_id) : null;
+  const companion = elder ? companionMetaFromKey(elder.companion_key) : null;
 
   const medications = useMedications(elder?.id ?? '');
   const progress = useProgress(elder?.id ?? '');

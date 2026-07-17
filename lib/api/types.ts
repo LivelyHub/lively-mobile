@@ -23,10 +23,14 @@ export interface Elder {
   name: string;
   honorific: string;
   companion_id: string;
+  // Added during local-connection reconciliation (2026-07-17): the backend
+  // returns the persona key directly since it's a fixed two-value enum and
+  // mobile resolves display metadata client-side (lib/companions.ts) — no
+  // need to guess it from the opaque companion_id.
+  companion_key: CompanionKey;
   health_flags: string[];
   phone_e164: string;
   created_at: string;
-  // ANTICIPATED (M9.1 pause toggle) — not yet a documented column in CORE.md §1.
   paused: boolean;
 }
 

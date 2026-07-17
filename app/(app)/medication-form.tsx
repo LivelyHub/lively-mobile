@@ -17,7 +17,7 @@ import { SelectChip } from '@/components/setup/SelectChip';
 import { colors, spacing, typography } from '@/constants/tokens';
 import { ApiError } from '@/lib/api/errors';
 import { useCreateMedication, useElders, useMedications, useUpdateMedication } from '@/lib/api/hooks';
-import { companionMetaFromId } from '@/lib/companions';
+import { companionMetaFromKey } from '@/lib/companions';
 
 type FieldErrors = { name?: string; dosage?: string; times?: string };
 
@@ -44,7 +44,7 @@ export default function MedicationFormScreen() {
 
   const elders = useElders();
   const elder = elders.data?.[0];
-  const companion = elder ? companionMetaFromId(elder.companion_id) : null;
+  const companion = elder ? companionMetaFromKey(elder.companion_key) : null;
 
   const medications = useMedications(elder?.id ?? '');
   const existing = isEditing ? medications.data?.find((m) => m.id === params.id) : undefined;

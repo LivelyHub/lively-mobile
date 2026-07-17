@@ -5,7 +5,7 @@ import { Avatar, Card, Skeleton } from '@/components/ui';
 import { colors, radii, spacing, typography } from '@/constants/tokens';
 import { useConversation, useProgress } from '@/lib/api/hooks';
 import type { Elder } from '@/lib/api/types';
-import { companionMetaFromId } from '@/lib/companions';
+import { companionMetaFromKey } from '@/lib/companions';
 import { relativeTime } from '@/lib/time';
 import { buildGlanceRows, lastHeardFrom } from './glance';
 import { GlanceRow } from './GlanceRow';
@@ -15,7 +15,7 @@ import { GlanceRow } from './GlanceRow';
 // derives them. Each card owns its own queries, keeping hooks stable across a
 // varying elder list.
 export function ElderCard({ elder }: { elder: Elder }) {
-  const companion = companionMetaFromId(elder.companion_id);
+  const companion = companionMetaFromKey(elder.companion_key);
   const conversation = useConversation(elder.id);
   const progress = useProgress(elder.id);
 

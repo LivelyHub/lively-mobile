@@ -17,7 +17,7 @@ import { colors, spacing, typography } from '@/constants/tokens';
 import { useIsOffline } from '@/hooks/useIsOffline';
 import { ApiError } from '@/lib/api/errors';
 import { useElders, useSendTitipan, useTitipanList } from '@/lib/api/hooks';
-import { companionMetaFromId } from '@/lib/companions';
+import { companionMetaFromKey } from '@/lib/companions';
 
 const TITIPAN_POLL_MS = 15_000; // Poll while the modal is open so a delivered_at set by the backend flips the pill (M7.1).
 
@@ -101,7 +101,7 @@ export default function TitipanScreen() {
         {elder ? (
           <View style={styles.stack}>
             <Text style={styles.explainer}>
-              {companionMetaFromId(elder.companion_id).displayName} akan menyampaikan pesan ini ke {honorific} dengan
+              {companionMetaFromKey(elder.companion_key).displayName} akan menyampaikan pesan ini ke {honorific} dengan
               gayanya sendiri.
             </Text>
 

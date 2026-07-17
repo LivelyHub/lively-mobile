@@ -29,13 +29,12 @@ export const COMPANION_META: Record<CompanionKey, CompanionMeta> = {
   },
 };
 
-// The elder payload carries only companion_id and CORE.md has no /companions read
-// endpoint yet, so resolve the id to its key by the known slug. The two companions
-// are fixed, so this stays correct until a companion lookup lands.
-export function companionKeyFromId(companionId: string): CompanionKey {
-  return companionId.includes('budi') ? 'mas_budi' : 'mbak_asih';
-}
-
-export function companionMetaFromId(companionId: string): CompanionMeta {
-  return COMPANION_META[companionKeyFromId(companionId)];
+// Elder responses carry companion_key directly (CORE.md §7 — added during
+// local-connection reconciliation 2026-07-17). This used to guess the key by
+// checking whether companion_id's string happened to contain "budi", which
+// only worked against mock fixture ids ('companion-mas-budi') — real
+// Postgres UUIDs never contain that substring, so every elder against the
+// real backend silently resolved to Mbak Asih regardless of actual companion.
+export function companionMetaFromKey(companionKey: CompanionKey): CompanionMeta {
+  return COMPANION_META[companionKey];
 }

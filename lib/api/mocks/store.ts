@@ -94,6 +94,7 @@ class MockStore {
       name: input.name,
       honorific: input.honorific,
       companion_id: companion.id,
+      companion_key: companion.key,
       health_flags: input.health_flags,
       phone_e164: input.phone_e164,
       created_at: new Date().toISOString(),
@@ -117,7 +118,10 @@ class MockStore {
     if (patch.paused !== undefined) elder.paused = patch.paused;
     if (patch.companion_key !== undefined) {
       const companion = this.companions.find((c) => c.key === patch.companion_key);
-      if (companion) elder.companion_id = companion.id;
+      if (companion) {
+        elder.companion_id = companion.id;
+        elder.companion_key = companion.key;
+      }
     }
     this.elders = this.elders.map((e) => (e.id === elderId ? elder : e));
     return elder;
