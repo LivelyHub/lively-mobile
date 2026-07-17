@@ -58,6 +58,12 @@ export const ELDER: Elder = {
   phone_e164: '+6281234567890',
   created_at: at(60, 9, 0),
   paused: false,
+  welcome_message_status: 'sent',
+  hobbies: ['berkebun', 'memasak'],
+  favorite_topics: ['cucu', 'masakan'],
+  avoid_topics: ['almarhum_suami'],
+  speech_style: 'Banyak pakai bahasa Jawa, suka bercanda.',
+  religion: 'islam',
 };
 
 let idCounter = 1000;

@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Button } from '@/components/ui';
 import { colors, radii, spacing, typography } from '@/constants/tokens';
+import type { WelcomeMessageStatus } from '@/lib/api/types';
 
 // The emotional beat (M2.1): a full-screen warm confirmation. Soft primary circle
 // with an Ionicon (never an emoji), the headline promising tomorrow's first
@@ -15,10 +16,22 @@ import { colors, radii, spacing, typography } from '@/constants/tokens';
 type SuccessMomentProps = {
   companionName: string;
   honorific: string;
+  welcomeMessageStatus?: WelcomeMessageStatus;
   onDone: () => void;
 };
 
-export function SuccessMoment({ companionName, honorific, onDone }: SuccessMomentProps) {
+const WELCOME_STATUS_COPY: Record<WelcomeMessageStatus, { icon: keyof typeof Ionicons.glyphMap; text: string }> = {
+  sent: { icon: 'checkmark-circle', text: 'Pesan perkenalan WhatsApp sudah terkirim' },
+  pending: { icon: 'time', text: 'Pesan perkenalan WhatsApp sedang dikirim...' },
+  failed: { icon: 'alert-circle', text: 'Pesan perkenalan belum terkirim, akan dicoba lagi' },
+};
+
+export function SuccessMoment({
+  companionName,
+  honorific,
+  welcomeMessageStatus,
+  onDone,
+}: SuccessMomentProps) {
   const insets = useSafeAreaInsets();
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.92)).current;
@@ -57,6 +70,16 @@ export function SuccessMoment({ companionName, honorific, onDone }: SuccessMomen
         <Text style={styles.sub}>
           Semua sudah siap. Kami kabari kalau ada yang perlu Anda tahu tentang {honorific}.
         </Text>
+        {welcomeMessageStatus ? (
+          <View style={styles.statusRow}>
+            <Ionicons
+              name={WELCOME_STATUS_COPY[welcomeMessageStatus].icon}
+              size={16}
+              color={welcomeMessageStatus === 'failed' ? colors.danger : colors.primary}
+            />
+            <Text style={styles.statusText}>{WELCOME_STATUS_COPY[welcomeMessageStatus].text}</Text>
+          </View>
+        ) : null}
       </Animated.View>
 
       <Button label="Kembali ke Beranda" onPress={onDone} fullWidth />
@@ -95,5 +118,14 @@ const styles = StyleSheet.create({
     ...typography.bodyMuted,
     textAlign: 'center',
     paddingHorizontal: spacing.sm,
+  },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginTop: spacing.xs,
+  },
+  statusText: {
+    ...typography.bodyMuted,
   },
 });

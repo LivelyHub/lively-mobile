@@ -10,6 +10,12 @@
 
 export type CompanionKey = 'mbak_asih' | 'mas_budi';
 
+export type Religion = 'islam' | 'kristen' | 'katolik' | 'lainnya';
+
+// ANTICIPATED (WA bot intro message, sent server-side on elder creation) —
+// lets mobile show a "message sent" confirmation instead of guessing from silence.
+export type WelcomeMessageStatus = 'pending' | 'sent' | 'failed';
+
 export interface Companion {
   id: string;
   key: CompanionKey;
@@ -32,6 +38,17 @@ export interface Elder {
   phone_e164: string;
   created_at: string;
   paused: boolean;
+  // Personalization (companion small-talk steer, added during the setup-wizard
+  // personalization pass): chip lists the companion draws on for what to bring
+  // up vs. avoid, plus a free-text tone note. Religion picks the right
+  // exclamation ("Alhamdulillah" / "Puji Tuhan") instead of a generic one.
+  hobbies: string[];
+  favorite_topics: string[];
+  avoid_topics: string[];
+  speech_style: string;
+  religion?: Religion;
+  // ANTICIPATED, see WelcomeMessageStatus above.
+  welcome_message_status: WelcomeMessageStatus;
 }
 
 export interface FamilyMember {
@@ -132,6 +149,11 @@ export interface CreateElderRequest {
   companion_key: CompanionKey;
   health_flags: string[];
   phone_e164: string;
+  hobbies: string[];
+  favorite_topics: string[];
+  avoid_topics: string[];
+  speech_style: string;
+  religion?: Religion;
 }
 
 export interface UpdateElderRequest {
@@ -139,11 +161,16 @@ export interface UpdateElderRequest {
   companion_key?: CompanionKey;
   health_flags?: string[];
   paused?: boolean; // ANTICIPATED, see Elder.paused
+  hobbies?: string[];
+  favorite_topics?: string[];
+  avoid_topics?: string[];
+  speech_style?: string;
+  religion?: Religion;
 }
 
 export interface ConversationQuery {
-  after?: string; // cursor: ISO timestamp, poll for new messages
-  before?: string; // cursor: ISO timestamp, page older history
+  after?: string; // cursor: message id, poll for new messages
+  before?: string; // cursor: message id, page older history
   limit?: number;
 }
 

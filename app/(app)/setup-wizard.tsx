@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Stack, router } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   BackHandler,
   KeyboardAvoidingView,
@@ -13,19 +13,27 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ChipListField } from '@/components/setup/ChipListField';
 import { PersonaCard } from '@/components/setup/PersonaCard';
 import { PhoneField } from '@/components/setup/PhoneField';
 import { SelectChip } from '@/components/setup/SelectChip';
 import { StepIndicator } from '@/components/setup/StepIndicator';
 import { SuccessMoment } from '@/components/setup/SuccessMoment';
 import {
+  AVOID_TOPIC_PRESETS,
   HEALTH_PRESETS,
+  HOBBY_PRESETS,
   HONORIFIC_OPTIONS,
   PERSONAS,
+  RELIGION_OPTIONS,
+  TOPIC_PRESETS,
+  avoidTopicLabel,
   composeE164,
   formatPhoneDisplay,
   healthFlagLabel,
+  hobbyLabel,
   personaByKey,
+  topicLabel,
   validatePhone,
 } from '@/components/setup/config';
 import { Banner, Button, TextField } from '@/components/ui';
@@ -33,10 +41,33 @@ import { colors, spacing, typography } from '@/constants/tokens';
 import { useRequestPushPermission } from '@/hooks/usePushRegistration';
 import { ApiError } from '@/lib/api/errors';
 import { useCreateElder } from '@/lib/api/hooks';
-import type { CompanionKey } from '@/lib/api/types';
+import type { CompanionKey, Religion, WelcomeMessageStatus } from '@/lib/api/types';
 
-const STEP_LABELS = ['Tentang Eyang', 'Pilih teman', 'Catatan kesehatan', 'Periksa kembali'] as const;
-const LAST_STEP = STEP_LABELS.length; // 4
+const STEP_LABELS = [
+  'Tentang Eyang',
+  'Pilih teman',
+  'Catatan kesehatan',
+  'Personalisasi',
+  'Periksa kembali',
+] as const;
+const LAST_STEP = STEP_LABELS.length; // 5
+
+// Generic preset-chip toggle + verbatim-custom-add, shared by health/hobbies/
+// topics/avoid-topics so each field isn't its own hand-rolled copy.
+function toggleChip(setter: (updater: (prev: string[]) => string[]) => void, code: string) {
+  setter((prev) => (prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]));
+}
+
+function addCustomChip(
+  setter: (updater: (prev: string[]) => string[]) => void,
+  value: string,
+  clearInput: () => void,
+) {
+  const trimmed = value.trim();
+  if (!trimmed) return;
+  setter((prev) => (prev.some((c) => c.toLowerCase() === trimmed.toLowerCase()) ? prev : [...prev, trimmed]));
+  clearInput();
+}
 
 type FieldErrors = { name?: string; honorific?: string; phone?: string };
 
@@ -49,6 +80,7 @@ export default function SetupWizardScreen() {
   // this route fresh (a new push from Home) resets it — the re-entry requirement.
   const [step, setStep] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [welcomeMessageStatus, setWelcomeMessageStatus] = useState<WelcomeMessageStatus | undefined>();
 
   const [name, setName] = useState('');
   const [honorificPreset, setHonorificPreset] = useState<string | null>(null);
@@ -57,6 +89,15 @@ export default function SetupWizardScreen() {
   const [companionKey, setCompanionKey] = useState<CompanionKey | null>(null);
   const [healthCodes, setHealthCodes] = useState<string[]>([]);
   const [customHealth, setCustomHealth] = useState('');
+
+  const [hobbies, setHobbies] = useState<string[]>([]);
+  const [customHobby, setCustomHobby] = useState('');
+  const [favoriteTopics, setFavoriteTopics] = useState<string[]>([]);
+  const [customTopic, setCustomTopic] = useState('');
+  const [avoidTopics, setAvoidTopics] = useState<string[]>([]);
+  const [customAvoidTopic, setCustomAvoidTopic] = useState('');
+  const [speechStyle, setSpeechStyle] = useState('');
+  const [religion, setReligion] = useState<Religion | null>(null);
 
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [companionError, setCompanionError] = useState<string | null>(null);
@@ -114,21 +155,12 @@ export default function SetupWizardScreen() {
   }
 
   function toggleHealth(code: string) {
-    setHealthCodes((prev) => (prev.includes(code) ? prev.filter((c) => c !== code) : [...prev, code]));
+    toggleChip(setHealthCodes, code);
   }
 
   function addCustomHealth() {
-    const value = customHealth.trim();
-    if (!value) return;
-    const exists = healthCodes.some((code) => code.toLowerCase() === value.toLowerCase());
-    if (!exists) setHealthCodes((prev) => [...prev, value]);
-    setCustomHealth('');
+    addCustomChip(setHealthCodes, customHealth, () => setCustomHealth(''));
   }
-
-  const customHealthCodes = useMemo(
-    () => healthCodes.filter((code) => !HEALTH_PRESETS.some((p) => p.code === code)),
-    [healthCodes],
-  );
 
   function handleSubmit() {
     if (!companionKey) return;
@@ -140,9 +172,15 @@ export default function SetupWizardScreen() {
         companion_key: companionKey,
         health_flags: healthCodes,
         phone_e164: composeE164(phone),
+        hobbies,
+        favorite_topics: favoriteTopics,
+        avoid_topics: avoidTopics,
+        speech_style: speechStyle.trim(),
+        religion: religion ?? undefined,
       },
       {
-        onSuccess: () => {
+        onSuccess: (elder) => {
+          setWelcomeMessageStatus(elder.welcome_message_status);
           setShowSuccess(true);
           // Ask for notification permission now that there's an elder to be
           // notified about (M8.1) — fire-and-forget so the success moment isn't
@@ -178,7 +216,12 @@ export default function SetupWizardScreen() {
     return (
       <>
         <Stack.Screen options={{ headerShown: false, gestureEnabled: false }} />
-        <SuccessMoment companionName={persona.displayName} honorific={honorific} onDone={handleDone} />
+        <SuccessMoment
+          companionName={persona.displayName}
+          honorific={honorific}
+          welcomeMessageStatus={welcomeMessageStatus}
+          onDone={handleDone}
+        />
       </>
     );
   }
@@ -197,7 +240,8 @@ export default function SetupWizardScreen() {
         {step === 1 ? renderAboutStep() : null}
         {step === 2 ? renderCompanionStep() : null}
         {step === 3 ? renderHealthStep() : null}
-        {step === 4 ? renderConfirmStep() : null}
+        {step === 4 ? renderPersonalizationStep() : null}
+        {step === 5 ? renderConfirmStep() : null}
       </ScrollView>
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}>
@@ -313,44 +357,91 @@ export default function SetupWizardScreen() {
           </Text>
         </View>
 
-        <View style={styles.chipWrap}>
-          {HEALTH_PRESETS.map((preset) => (
-            <SelectChip
-              key={preset.code}
-              label={preset.label}
-              selected={healthCodes.includes(preset.code)}
-              onPress={() => toggleHealth(preset.code)}
-            />
-          ))}
-          {customHealthCodes.map((code) => (
-            <SelectChip
-              key={code}
-              label={healthFlagLabel(code)}
-              selected
-              onPress={() => toggleHealth(code)}
-              onRemove={() => toggleHealth(code)}
-            />
-          ))}
+        <ChipListField
+          presets={HEALTH_PRESETS}
+          selected={healthCodes}
+          onToggle={toggleHealth}
+          customValue={customHealth}
+          onCustomChange={setCustomHealth}
+          onAddCustom={addCustomHealth}
+          placeholder="Tambah catatan lain"
+          disabled={createElder.isPending}
+        />
+      </View>
+    );
+  }
+
+  function renderPersonalizationStep() {
+    return (
+      <View style={styles.stepBody}>
+        <View style={styles.stepHeader}>
+          <Text style={styles.heading}>Kenali {honorific || 'Eyang'} lebih dekat</Text>
+          <Text style={styles.subheading}>
+            Ini yang bikin obrolan teman Eyang terasa personal, bukan sekadar sapaan.
+          </Text>
+        </View>
+
+        <ChipListField
+          label="Hobi"
+          presets={HOBBY_PRESETS}
+          selected={hobbies}
+          onToggle={(code) => toggleChip(setHobbies, code)}
+          customValue={customHobby}
+          onCustomChange={setCustomHobby}
+          onAddCustom={() => addCustomChip(setHobbies, customHobby, () => setCustomHobby(''))}
+          placeholder="Tambah hobi lain"
+          disabled={createElder.isPending}
+        />
+
+        <ChipListField
+          label="Topik favorit"
+          helper="Hal-hal yang bikin semangat kalau dibahas."
+          presets={TOPIC_PRESETS}
+          selected={favoriteTopics}
+          onToggle={(code) => toggleChip(setFavoriteTopics, code)}
+          customValue={customTopic}
+          onCustomChange={setCustomTopic}
+          onAddCustom={() => addCustomChip(setFavoriteTopics, customTopic, () => setCustomTopic(''))}
+          placeholder="Tambah topik lain"
+          disabled={createElder.isPending}
+        />
+
+        <ChipListField
+          label="Topik yang dihindari"
+          helper="Kalau ada duka atau hal berat yang sebaiknya tidak disinggung dulu."
+          presets={AVOID_TOPIC_PRESETS}
+          selected={avoidTopics}
+          onToggle={(code) => toggleChip(setAvoidTopics, code)}
+          customValue={customAvoidTopic}
+          onCustomChange={setCustomAvoidTopic}
+          onAddCustom={() =>
+            addCustomChip(setAvoidTopics, customAvoidTopic, () => setCustomAvoidTopic(''))
+          }
+          placeholder="Tambah topik lain"
+          disabled={createElder.isPending}
+        />
+
+        <View>
+          <Text style={styles.fieldLabel}>Agama</Text>
+          <View style={styles.chipWrap}>
+            {RELIGION_OPTIONS.map((option) => (
+              <SelectChip
+                key={option.code}
+                label={option.label}
+                selected={religion === option.code}
+                onPress={() => setReligion(option.code)}
+              />
+            ))}
+          </View>
         </View>
 
         <TextField
-          placeholder="Tambah catatan lain"
-          value={customHealth}
-          onChangeText={setCustomHealth}
-          onSubmitEditing={addCustomHealth}
-          returnKeyType="done"
-          autoCapitalize="none"
+          label="Gaya bicara"
+          placeholder="Misalnya: banyak pakai bahasa Jawa, suka bercanda"
+          value={speechStyle}
+          onChangeText={setSpeechStyle}
+          autoCapitalize="sentences"
           editable={!createElder.isPending}
-          rightElement={
-            <Pressable
-              onPress={addCustomHealth}
-              hitSlop={8}
-              accessibilityRole="button"
-              accessibilityLabel="Tambahkan catatan"
-            >
-              <Ionicons name="add-circle" size={24} color={colors.primary} />
-            </Pressable>
-          }
         />
       </View>
     );
@@ -358,6 +449,10 @@ export default function SetupWizardScreen() {
 
   function renderConfirmStep() {
     const healthLabels = healthCodes.map((code) => healthFlagLabel(code));
+    const hobbyLabels = hobbies.map((code) => hobbyLabel(code));
+    const topicLabels = favoriteTopics.map((code) => topicLabel(code));
+    const avoidLabels = avoidTopics.map((code) => avoidTopicLabel(code));
+    const religionLabel = religion ? RELIGION_OPTIONS.find((o) => o.code === religion)?.label : undefined;
     return (
       <View style={styles.stepBody}>
         <View style={styles.stepHeader}>
@@ -384,6 +479,36 @@ export default function SetupWizardScreen() {
             value={healthLabels.length ? healthLabels.join(', ') : 'Belum ada'}
             onEdit={() => setStep(3)}
             muted={healthLabels.length === 0}
+          />
+          <SummaryRow
+            label="Hobi"
+            value={hobbyLabels.length ? hobbyLabels.join(', ') : 'Belum ada'}
+            onEdit={() => setStep(4)}
+            muted={hobbyLabels.length === 0}
+          />
+          <SummaryRow
+            label="Topik favorit"
+            value={topicLabels.length ? topicLabels.join(', ') : 'Belum ada'}
+            onEdit={() => setStep(4)}
+            muted={topicLabels.length === 0}
+          />
+          <SummaryRow
+            label="Topik yang dihindari"
+            value={avoidLabels.length ? avoidLabels.join(', ') : 'Belum ada'}
+            onEdit={() => setStep(4)}
+            muted={avoidLabels.length === 0}
+          />
+          <SummaryRow
+            label="Gaya bicara"
+            value={speechStyle.trim() || 'Belum ada'}
+            onEdit={() => setStep(4)}
+            muted={!speechStyle.trim()}
+          />
+          <SummaryRow
+            label="Agama"
+            value={religionLabel ?? 'Belum ada'}
+            onEdit={() => setStep(4)}
+            muted={!religionLabel}
           />
         </View>
       </View>
@@ -413,7 +538,15 @@ export default function SetupWizardScreen() {
         </View>
       );
     }
-    const primaryLabel = step === 3 && healthCodes.length === 0 ? 'Lewati' : 'Lanjut';
+    const step3Empty = step === 3 && healthCodes.length === 0;
+    const step4Empty =
+      step === 4 &&
+      hobbies.length === 0 &&
+      favoriteTopics.length === 0 &&
+      avoidTopics.length === 0 &&
+      !speechStyle.trim() &&
+      !religion;
+    const primaryLabel = step3Empty || step4Empty ? 'Lewati' : 'Lanjut';
     return (
       <View style={styles.footerRow}>
         <Button

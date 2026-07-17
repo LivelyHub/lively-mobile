@@ -99,6 +99,12 @@ class MockStore {
       phone_e164: input.phone_e164,
       created_at: new Date().toISOString(),
       paused: false,
+      welcome_message_status: 'pending',
+      hobbies: input.hobbies,
+      favorite_topics: input.favorite_topics,
+      avoid_topics: input.avoid_topics,
+      speech_style: input.speech_style,
+      religion: input.religion,
     };
     this.elders = [...this.elders, elder];
     this.conversationsByElder.set(elder.id, []);
@@ -116,6 +122,11 @@ class MockStore {
     if (patch.honorific !== undefined) elder.honorific = patch.honorific;
     if (patch.health_flags !== undefined) elder.health_flags = patch.health_flags;
     if (patch.paused !== undefined) elder.paused = patch.paused;
+    if (patch.hobbies !== undefined) elder.hobbies = patch.hobbies;
+    if (patch.favorite_topics !== undefined) elder.favorite_topics = patch.favorite_topics;
+    if (patch.avoid_topics !== undefined) elder.avoid_topics = patch.avoid_topics;
+    if (patch.speech_style !== undefined) elder.speech_style = patch.speech_style;
+    if (patch.religion !== undefined) elder.religion = patch.religion;
     if (patch.companion_key !== undefined) {
       const companion = this.companions.find((c) => c.key === patch.companion_key);
       if (companion) {
