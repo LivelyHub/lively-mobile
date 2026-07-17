@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import {
   ActivityIndicator,
   FlatList,
+  Platform,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -28,6 +29,10 @@ const OLDER_PAGE = 30; // page size for the older-history `before` cursor.
 // In an inverted list contentOffset.y is ~0 when the newest message is visible;
 // it grows as the user scrolls up into history. Treat "near 0" as at-bottom.
 const AT_BOTTOM_THRESHOLD = 24;
+// react-native-web's FlatList `inverted` flips the rendered content (text
+// renders upside down) instead of just reordering it, so web renders the
+// list right-side-up and reverses the scroll-direction logic below instead.
+const IS_WEB = Platform.OS === 'web';
 
 function dedupeSortById(messages: ConversationMessage[]): ConversationMessage[] {
   const map = new Map<string, ConversationMessage>();
@@ -68,9 +73,13 @@ export default function ChatScreen() {
     [conversation.data, olderMessages],
   );
 
-  // items are built oldest -> newest with day separators, then reversed for the
-  // inverted FlatList so data[0] (newest) renders at the bottom.
-  const items = useMemo(() => [...buildChatItems(messages)].reverse(), [messages]);
+  // items are built oldest -> newest with day separators. Native inverts the
+  // list (so data[0] must be newest); web renders top-to-bottom normally.
+  const orderedItems = useMemo(() => buildChatItems(messages), [messages]);
+  const items = useMemo(
+    () => (IS_WEB ? orderedItems : [...orderedItems].reverse()),
+    [orderedItems],
+  );
 
   // Reset the pagination + arrival trackers when the active elder changes.
   useEffect(() => {
@@ -96,23 +105,16 @@ export default function ChatScreen() {
     if (newestId !== lastNewestIdRef.current) {
       lastNewestIdRef.current = newestId;
       if (atBottomRef.current) {
-        requestAnimationFrame(() => listRef.current?.scrollToOffset({ offset: 0, animated: true }));
+        requestAnimationFrame(() =>
+          IS_WEB
+            ? listRef.current?.scrollToEnd({ animated: true })
+            : listRef.current?.scrollToOffset({ offset: 0, animated: true }),
+        );
       } else {
         setShowNewPill(true);
       }
     }
   }, [messages]);
-
-  const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const atBottom = e.nativeEvent.contentOffset.y <= AT_BOTTOM_THRESHOLD;
-    atBottomRef.current = atBottom;
-    if (atBottom) setShowNewPill(false);
-  }, []);
-
-  const scrollToBottom = useCallback(() => {
-    listRef.current?.scrollToOffset({ offset: 0, animated: true });
-    setShowNewPill(false);
-  }, []);
 
   // Load older history via the `before` cursor (visual top of the inverted list).
   // In mock mode the base query already returns everything, so the first call
@@ -143,6 +145,26 @@ export default function ChatScreen() {
       setIsLoadingOlder(false);
     }
   }, [elder, messages]);
+
+  const onScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+    const atBottom = IS_WEB
+      ? contentOffset.y + layoutMeasurement.height >= contentSize.height - AT_BOTTOM_THRESHOLD
+      : contentOffset.y <= AT_BOTTOM_THRESHOLD;
+    atBottomRef.current = atBottom;
+    if (atBottom) setShowNewPill(false);
+
+    if (IS_WEB && contentOffset.y <= AT_BOTTOM_THRESHOLD) void loadOlder();
+  }, [loadOlder]);
+
+  const scrollToBottom = useCallback(() => {
+    if (IS_WEB) {
+      listRef.current?.scrollToEnd({ animated: true });
+    } else {
+      listRef.current?.scrollToOffset({ offset: 0, animated: true });
+    }
+    setShowNewPill(false);
+  }, []);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -235,14 +257,21 @@ export default function ChatScreen() {
             <FlatList
               ref={listRef}
               data={items}
-              inverted
+              inverted={!IS_WEB}
               keyExtractor={(item) => item.id}
               renderItem={renderItem}
               contentContainerStyle={styles.listContent}
               onScroll={onScroll}
               scrollEventThrottle={16}
-              onEndReached={loadOlder}
+              onEndReached={IS_WEB ? undefined : loadOlder}
               onEndReachedThreshold={0.4}
+              onContentSizeChange={
+                IS_WEB
+                  ? () => {
+                      if (atBottomRef.current) listRef.current?.scrollToEnd({ animated: false });
+                    }
+                  : undefined
+              }
               ListFooterComponent={
                 isLoadingOlder ? (
                   <View style={styles.paginationRow}>

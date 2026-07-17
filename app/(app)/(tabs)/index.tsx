@@ -10,7 +10,6 @@ import { AlertCard } from '@/components/home/AlertCard';
 import { sortAlertsByUrgency } from '@/components/home/alertPresentation';
 import { ElderCard } from '@/components/home/ElderCard';
 import { HomeSkeleton } from '@/components/home/HomeSkeleton';
-import { QuickActions } from '@/components/home/QuickActions';
 import { colors, spacing, typography } from '@/constants/tokens';
 import { useAlerts, useElders, useFamilyMember } from '@/lib/api/hooks';
 
@@ -73,14 +72,6 @@ export default function HomeScreen() {
         </View>
         <ProfileMenu name={family.data?.name} />
       </View>
-
-      {!showFirstLoad && !showFullError && eldersData.length > 0 ? (
-        <QuickActions
-          onChat={() => router.navigate('/chat')}
-          onProgress={() => router.navigate('/progress')}
-          onTitipan={() => router.push('/titipan')}
-        />
-      ) : null}
 
       {elders.isError && elders.data ? (
         <Banner
