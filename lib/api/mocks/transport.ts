@@ -68,7 +68,7 @@ export async function mockRequest<T>(path: string, options: RequestOptions): Pro
     let messages = mockStore.getConversation(params.id);
     if (query.after) messages = messages.filter((m) => m.created_at > String(query.after));
     if (query.before) messages = messages.filter((m) => m.created_at < String(query.before));
-    return messages as unknown as T;
+    return { messages, next_cursor: null } as unknown as T;
   }
   if (method === 'POST' && (params = match('/elders/:id/titipan', path))) {
     return mockStore.createTitipan(params.id, body as CreateTitipanRequest) as unknown as T;
