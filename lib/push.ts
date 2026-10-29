@@ -1,5 +1,6 @@
 import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
+import type * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 // Push registration helpers (M8.1). All functions are safe to call on web and on
@@ -8,21 +9,33 @@ import { Platform } from 'react-native';
 
 export type PushPermission = 'granted' | 'denied' | 'undetermined' | 'unsupported';
 
-const SUPPORTED = Platform.OS === 'ios' || Platform.OS === 'android';
+const SUPPORTED = (Platform.OS === 'ios' || Platform.OS === 'android') &&
+  Device.isDevice && Constants.executionEnvironment !== ExecutionEnvironment.StoreClient;
 
 // Foreground behavior: show the banner + play sound even while the app is open,
 // so a demo-day alert is visible without backgrounding the app.
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+let notifications: Promise<typeof import('expo-notifications')> | undefined;
+
+export async function getPushNotifications() {
+  if (!SUPPORTED) return null;
+  notifications ??= import('expo-notifications').then((module) => {
+    module.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+    return module;
+  });
+  return notifications;
+}
 
 async function ensureAndroidChannel(): Promise<void> {
   if (Platform.OS !== 'android') return;
+  const Notifications = await getPushNotifications();
+  if (!Notifications) return;
   await Notifications.setNotificationChannelAsync('alerts', {
     name: 'Peringatan',
     importance: Notifications.AndroidImportance.MAX,
@@ -34,6 +47,8 @@ async function ensureAndroidChannel(): Promise<void> {
 export async function getPushPermission(): Promise<PushPermission> {
   if (!SUPPORTED) return 'unsupported';
   try {
+    const Notifications = await getPushNotifications();
+    if (!Notifications) return 'unsupported';
     const { status } = await Notifications.getPermissionsAsync();
     if (status === 'granted') return 'granted';
     if (status === 'denied') return 'denied';
@@ -48,6 +63,8 @@ export async function getPushPermission(): Promise<PushPermission> {
 export async function requestPushPermission(): Promise<PushPermission> {
   if (!SUPPORTED) return 'unsupported';
   try {
+    const Notifications = await getPushNotifications();
+    if (!Notifications) return 'unsupported';
     const existing = await Notifications.getPermissionsAsync();
     let status = existing.status;
     if (existing.status !== 'granted' && existing.canAskAgain) {
@@ -69,6 +86,8 @@ export async function requestPushPermission(): Promise<PushPermission> {
 export async function getExpoPushToken(): Promise<string | null> {
   if (!SUPPORTED || !Device.isDevice) return null;
   try {
+    const Notifications = await getPushNotifications();
+    if (!Notifications) return null;
     const token = await Notifications.getExpoPushTokenAsync();
     return token.data;
   } catch {

@@ -155,6 +155,13 @@ Where the 8→12 chair-test arc — the demo's clinical proof — renders. Also 
 **Test:** curl an `emergency` alert → push arrives → tap → lands on detail. Code-complete: `lib/push.ts` + `hooks/usePushRegistration.ts` (permission prompt fired from the wizard success `onSuccess`, token PATCHed on grant, cold-start token re-check + `getLastNotificationResponseAsync`/`addNotificationResponseReceivedListener` deep-link into `/alert/[id]`, denied → dismissible banner on Alerts via `usePushPermission`). All push helpers no-op on web/simulator (verified: dev server logs the expected "not supported on web" notice, app stays functional via polling). The curl→push→tap loop needs a native dev build + real backend and stays unverified until then; `expo-notifications` added to `app.json` plugins for that build.
 **Depends on:** M1.1, backend B7.2.
 
+### M8.1a Unsupported push runtime fallback `P1`
+- [ ] Expo Go, web, and Android emulators skip importing remote notification APIs and use the existing polling experience.
+- [ ] Native development builds on physical devices retain permission, token registration, and notification deep-link handling.
+- [ ] Async listener setup cannot retain a subscription after its component unmounts.
+
+**Test:** launch the populated prototype in Android Expo Go, sign in, and visit Home, Chat, Progress, and Alerts without an unsupported remote-push error. Run TypeScript and Android bundle checks. Replay permission/token/deep-link behavior separately on a physical development build before marking that acceptance box complete.
+
 ### M8.2 Alerts list + detail `P1`
 **UI states:** skeleton (alert rows) · empty (reassuring — "Tidak ada peringatan. {honorific} baik-baik saja") · error + retry · resolve loading · pull-to-refresh.
 - [x] List newest-first, unresolved on top; each row: type icon + urgency color (UI-UX §5), headline copy per type, relative time
