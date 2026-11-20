@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { PressableScale } from '@/components/ui/PressableScale';
 import { colors, radii, spacing, typography } from '@/constants/tokens';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -19,12 +20,13 @@ export function ShortcutRow({ shortcuts }: { shortcuts: Shortcut[] }) {
   return (
     <View style={styles.row}>
       {shortcuts.map((s) => (
-        <Pressable
+        <PressableScale
           key={s.key}
+          pressedScale={0.95}
           onPress={s.onPress}
           accessibilityRole="button"
           accessibilityLabel={s.label}
-          style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
+          style={styles.item}
         >
           <View style={styles.iconBadge}>
             <Ionicons name={s.icon} size={22} color={colors.primary} />
@@ -32,7 +34,7 @@ export function ShortcutRow({ shortcuts }: { shortcuts: Shortcut[] }) {
           <Text style={styles.label} numberOfLines={1}>
             {s.label}
           </Text>
-        </Pressable>
+        </PressableScale>
       ))}
     </View>
   );
@@ -47,9 +49,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.xs,
     flex: 1,
-  },
-  itemPressed: {
-    opacity: 0.6,
   },
   iconBadge: {
     width: 52,
