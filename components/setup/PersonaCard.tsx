@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Avatar } from '@/components/ui/Avatar';
+import { PressableScale } from '@/components/ui/PressableScale';
 import { colors, radii, shadow, spacing, typography } from '@/constants/tokens';
 import type { Persona } from './config';
 
@@ -20,16 +21,14 @@ type PersonaCardProps = {
 export function PersonaCard({ persona, honorific, selected, onPress }: PersonaCardProps) {
   const greetingName = honorific.trim() || 'Eyang';
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
+      pressedScale={0.98}
       accessibilityRole="button"
       accessibilityState={{ selected }}
       accessibilityLabel={`Pilih ${persona.displayName}`}
-      style={({ pressed }) => [
-        styles.card,
-        selected ? styles.cardSelected : styles.cardIdle,
-        pressed && styles.cardPressed,
-      ]}
+      style={[styles.card, selected ? styles.cardSelected : styles.cardIdle]}
+      pressedStyle={styles.cardPressed}
     >
       <View style={styles.header}>
         <Avatar initials={persona.initials} tint={persona.tint} tintText={persona.tintText} size={56} />
@@ -45,7 +44,7 @@ export function PersonaCard({ persona, honorific, selected, onPress }: PersonaCa
       <View style={styles.bubble}>
         <Text style={styles.bubbleText}>{persona.greeting(greetingName)}</Text>
       </View>
-    </Pressable>
+    </PressableScale>
   );
 }
 

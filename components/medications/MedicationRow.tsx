@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { StyleSheet, Switch, Text, View } from 'react-native';
 
-import { Card } from '@/components/ui';
+import { Card, PressableScale } from '@/components/ui';
 import { colors, radii, spacing, typography } from '@/constants/tokens';
 import type { Medication } from '@/lib/api/types';
 import { slotDisplayStatus, type MedSlotDisplayStatus, type MedSlotStatus } from '@/lib/medications';
@@ -33,11 +33,13 @@ export function MedicationRow({ medication, slots, onPress, onToggleActive, togg
   const times = [...medication.schedule_times].sort();
 
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
+      pressedScale={0.98}
       accessibilityRole="button"
       accessibilityLabel={`Ubah ${medication.name}`}
-      style={({ pressed }) => [styles.pressable, pressed && styles.pressed]}
+      style={styles.pressable}
+      pressedStyle={styles.pressed}
     >
       <Card>
         <View style={styles.header}>
@@ -86,7 +88,7 @@ export function MedicationRow({ medication, slots, onPress, onToggleActive, togg
           <Text style={styles.inactiveNote}>Nonaktif — tidak diingatkan hari ini.</Text>
         ) : null}
       </Card>
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -95,7 +97,7 @@ const styles = StyleSheet.create({
     minHeight: 56,
   },
   pressed: {
-    opacity: 0.7,
+    opacity: 0.85,
   },
   header: {
     flexDirection: 'row',

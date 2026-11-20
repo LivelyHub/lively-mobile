@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { PressableScale } from '@/components/ui/PressableScale';
 import { colors, radii, spacing, typography } from '@/constants/tokens';
 
 // Shared selectable chip for honorific + health notes + medication time slots.
@@ -51,17 +52,14 @@ export function SelectChip({ label, selected, onPress, onRemove, accessibilityHi
   }
 
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
+      pressedScale={0.96}
       accessibilityRole="button"
       accessibilityState={{ selected }}
       accessibilityHint={accessibilityHint}
-      style={({ pressed }) => [
-        styles.chip,
-        styles.chipPadded,
-        selected ? styles.chipSelected : styles.chipIdle,
-        pressed && (selected ? styles.chipSelectedPressed : styles.chipIdlePressed),
-      ]}
+      style={[styles.chip, styles.chipPadded, selected ? styles.chipSelected : styles.chipIdle]}
+      pressedStyle={selected ? styles.chipSelectedPressed : styles.chipIdlePressed}
     >
       {labelNode}
       {selected ? (
@@ -69,7 +67,7 @@ export function SelectChip({ label, selected, onPress, onRemove, accessibilityHi
           <Ionicons name="checkmark" size={16} color={colors.primary} />
         </View>
       ) : null}
-    </Pressable>
+    </PressableScale>
   );
 }
 
