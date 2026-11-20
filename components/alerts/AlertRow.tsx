@@ -1,13 +1,14 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { alertHeadline, alertIcon, alertTone, TONE_STYLE } from '@/components/home/alertPresentation';
+import { PressableScale } from '@/components/ui/PressableScale';
 import { colors, radii, shadow, spacing, typography } from '@/constants/tokens';
 import type { Alert } from '@/lib/api/types';
 import { relativeTime } from '@/lib/time';
 
 // One row in the Alerts list. Unresolved rows carry the urgency-tiered accent
-// (icon tint + a left rail); resolved rows drop to a calm, muted treatment with
+// (full tonal fill + tinted icon); resolved rows drop to a calm, muted treatment with
 // a check, so the list reads "handled below, live on top" at a glance.
 type AlertRowProps = {
   alert: Alert;
@@ -22,21 +23,18 @@ export function AlertRow({ alert, honorific, onPress }: AlertRowProps) {
   const resolved = Boolean(alert.resolved_at);
 
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
+      pressedScale={0.98}
       accessibilityRole="button"
       accessibilityLabel={`${headline}. ${resolved ? 'Sudah selesai. ' : ''}Buka detail.`}
-      style={({ pressed }) => [
-        styles.row,
-        resolved && styles.rowResolved,
-        pressed && styles.pressed,
-      ]}
+      style={[styles.row, resolved ? styles.rowResolved : { backgroundColor: background }]}
+      pressedStyle={styles.pressed}
     >
-      {!resolved ? <View style={[styles.rail, { backgroundColor: accent }]} /> : null}
       <View
         style={[
           styles.iconWrap,
-          { backgroundColor: resolved ? colors.hairline : background },
+          { backgroundColor: resolved ? colors.hairline : colors.surface },
         ]}
       >
         <Ionicons
@@ -59,7 +57,7 @@ export function AlertRow({ alert, honorific, onPress }: AlertRowProps) {
         size={20}
         color={resolved ? colors.textMuted : accent}
       />
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -73,7 +71,6 @@ const styles = StyleSheet.create({
     borderRadius: radii.card,
     backgroundColor: colors.surface,
     minHeight: 72,
-    overflow: 'hidden',
     ...shadow.card,
   },
   rowResolved: {
@@ -85,13 +82,6 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.85,
-  },
-  rail: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 4,
   },
   iconWrap: {
     width: 44,

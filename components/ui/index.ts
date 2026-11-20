@@ -7,6 +7,7 @@ export { Card } from './Card';
 export { ConfirmSheet } from './ConfirmSheet';
 export { EmptyState } from './EmptyState';
 export { ErrorState } from './ErrorState';
+export { PressableScale } from './PressableScale';
 export { ProfileMenu } from './ProfileMenu';
 export { Skeleton } from './Skeleton';
 export { TabBar } from './TabBar';

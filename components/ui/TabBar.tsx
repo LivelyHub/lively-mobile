@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { PressableScale } from './PressableScale';
 import { colors, radii, shadow, spacing } from '@/constants/tokens';
 
 // Pill height (44 item + 2x8 padding) + its bottom margin — screens under the
@@ -18,7 +19,7 @@ const ICONS: Record<string, { active: keyof typeof Ionicons.glyphMap; inactive: 
   alerts: { active: 'notifications', inactive: 'notifications-outline' },
 };
 
-export function TabBar({ state, navigation }: BottomTabBarProps) {
+export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -35,14 +36,15 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
           };
 
           return (
-            <Pressable
+            <PressableScale
               key={route.key}
+              pressedScale={0.92}
               accessibilityRole="button"
               accessibilityState={focused ? { selected: true } : {}}
-              accessibilityLabel={route.name}
+              accessibilityLabel={descriptors[route.key]?.options.title ?? route.name}
               onPress={onPress}
               hitSlop={8}
-              style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}
+              style={styles.item}
             >
               <View style={[styles.iconDot, focused && styles.iconDotActive]}>
                 <Ionicons
@@ -51,7 +53,7 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
                   color={focused ? colors.tabBarIconActive : colors.tabBarIconInactive}
                 />
               </View>
-            </Pressable>
+            </PressableScale>
           );
         })}
       </View>
@@ -83,9 +85,6 @@ const styles = StyleSheet.create({
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  itemPressed: {
-    opacity: 0.75,
   },
   iconDot: {
     width: 40,

@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { PressableScale } from '@/components/ui/PressableScale';
 import { colors, radii, spacing, typography } from '@/constants/tokens';
 import type { Alert } from '@/lib/api/types';
 import { relativeTime } from '@/lib/time';
@@ -21,15 +22,13 @@ export function AlertCard({ alert, honorific, extraCount = 0, onPress }: AlertCa
   const headline = alertHeadline(alert, honorific);
 
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
+      pressedScale={0.98}
       accessibilityRole="button"
       accessibilityLabel={`${headline}. Buka Peringatan.`}
-      style={({ pressed }) => [
-        styles.card,
-        { backgroundColor: background, borderColor: accent },
-        pressed && styles.pressed,
-      ]}
+      style={[styles.card, { backgroundColor: background, borderColor: accent }]}
+      pressedStyle={styles.pressed}
     >
       <View style={[styles.iconWrap, { backgroundColor: colors.surface }]}>
         <Ionicons name={alertIcon(alert.type)} size={22} color={accent} />
@@ -42,7 +41,7 @@ export function AlertCard({ alert, honorific, extraCount = 0, onPress }: AlertCa
         </Text>
       </View>
       <Ionicons name="chevron-forward" size={20} color={accent} />
-    </Pressable>
+    </PressableScale>
   );
 }
 
