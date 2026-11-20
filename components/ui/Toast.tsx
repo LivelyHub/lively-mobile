@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -55,7 +55,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       translateY.setValue(20);
       opacity.setValue(0);
       Animated.parallel([
-        Animated.spring(translateY, { toValue: 0, useNativeDriver: true, bounciness: 4 }),
+        Animated.timing(translateY, {
+          toValue: 0,
+          duration: 220,
+          easing: Easing.bezier(0.23, 1, 0.32, 1),
+          useNativeDriver: true,
+        }),
         Animated.timing(opacity, { toValue: 1, duration: 180, useNativeDriver: true }),
       ]).start();
       hideTimer.current = setTimeout(hide, DURATION);

@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { PressableScale } from '@/components/ui/PressableScale';
 import { colors, radii, shadow, spacing, typography } from '@/constants/tokens';
 
 // Brand-forward hero card (design ref: bold promo banner on grocery-style
@@ -8,10 +9,12 @@ import { colors, radii, shadow, spacing, typography } from '@/constants/tokens';
 // nudges toward Titipan instead of a literal product/discount pitch.
 export function HomeBanner({ honorific, onPress }: { honorific: string; onPress: () => void }) {
   return (
-    <Pressable
+    <PressableScale
       onPress={onPress}
+      pressedScale={0.98}
       accessibilityRole="button"
-      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      style={styles.card}
+      pressedStyle={styles.cardPressed}
     >
       <View style={styles.text}>
         <Text style={styles.eyebrow}>Kirim kabar</Text>
@@ -24,7 +27,7 @@ export function HomeBanner({ honorific, onPress }: { honorific: string; onPress:
       <View style={styles.iconBadge}>
         <Ionicons name="gift" size={32} color={colors.textOnPrimary} />
       </View>
-    </Pressable>
+    </PressableScale>
   );
 }
 

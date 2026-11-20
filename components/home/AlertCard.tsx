@@ -73,7 +73,9 @@ const styles = StyleSheet.create({
     ...typography.body,
     fontWeight: '600',
   },
+  // Tonal fills (esp. dangerSoft) drop muted text under 4.5:1; ink keeps it AA.
   meta: {
     ...typography.caption,
+    color: colors.text,
   },
 });

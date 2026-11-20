@@ -1,8 +1,5 @@
-import { useRef } from 'react';
 import {
   ActivityIndicator,
-  Animated,
-  Pressable,
   StyleSheet,
   Text,
   View,
@@ -11,6 +8,7 @@ import {
 } from 'react-native';
 
 import { colors, radii, spacing, typography } from '@/constants/tokens';
+import { PressableScale } from './PressableScale';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 export type ButtonShape = 'default' | 'pill';
@@ -72,43 +70,28 @@ export function Button({
 }: ButtonProps) {
   const v = VARIANTS[variant];
   const isDisabled = disabled || loading;
-  const scale = useRef(new Animated.Value(1)).current;
-
-  const animateTo = (to: number) => {
-    Animated.spring(scale, {
-      toValue: to,
-      useNativeDriver: true,
-      speed: 40,
-      bounciness: 0,
-    }).start();
-  };
-
   return (
-    <Animated.View
+    <PressableScale
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
+      disabled={isDisabled}
+      onPress={onPress}
+      pressedScale={0.98}
+      pressedStyle={{ backgroundColor: v.backgroundPressed }}
       style={[
         fullWidth && styles.fullWidth,
-        { transform: [{ scale }], opacity: isDisabled && !loading ? 0.45 : 1 },
+        styles.base,
+        shape === 'pill' && styles.pill,
+        {
+          backgroundColor: v.background,
+          borderColor: v.borderColor ?? 'transparent',
+          borderWidth: v.borderColor ? 1 : 0,
+          opacity: isDisabled && !loading ? 0.45 : 1,
+        },
         style,
       ]}
     >
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel ?? label}
-        accessibilityState={{ disabled: isDisabled, busy: loading }}
-        disabled={isDisabled}
-        onPress={onPress}
-        onPressIn={() => animateTo(0.98)}
-        onPressOut={() => animateTo(1)}
-        style={({ pressed }) => [
-          styles.base,
-          shape === 'pill' && styles.pill,
-          {
-            backgroundColor: pressed && !isDisabled ? v.backgroundPressed : v.background,
-            borderColor: v.borderColor ?? 'transparent',
-            borderWidth: v.borderColor ? 1 : 0,
-          },
-        ]}
-      >
         {/* Keep width stable while loading: label stays laid out, hidden under the spinner. */}
         <View style={styles.content}>
           {iconLeft ? <View style={styles.icon}>{iconLeft}</View> : null}
@@ -124,8 +107,7 @@ export function Button({
             <ActivityIndicator color={v.label} />
           </View>
         ) : null}
-      </Pressable>
-    </Animated.View>
+    </PressableScale>
   );
 }
 

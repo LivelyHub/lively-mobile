@@ -47,7 +47,7 @@ export function AlertRow({ alert, honorific, onPress }: AlertRowProps) {
         <Text style={[styles.headline, resolved && styles.headlineResolved]} numberOfLines={2}>
           {headline}
         </Text>
-        <Text style={styles.meta}>
+        <Text style={[styles.meta, !resolved && styles.metaOnTone]}>
           {resolved ? 'Selesai · ' : ''}
           {relativeTime(alert.created_at)}
         </Text>
@@ -104,5 +104,9 @@ const styles = StyleSheet.create({
   },
   meta: {
     ...typography.caption,
+  },
+  // Unresolved rows sit on a tonal fill; muted text on dangerSoft is 4.44:1 (<AA), so use ink.
+  metaOnTone: {
+    color: colors.text,
   },
 });
