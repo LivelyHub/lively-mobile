@@ -6,9 +6,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PressableScale } from './PressableScale';
 import { colors, radii, shadow, spacing } from '@/constants/tokens';
 
-// Pill height (44 item + 2x8 padding) + its bottom margin — screens under the
-// floating bar add this much bottom padding so content never sits behind it.
+// Pill height (44 item + 2x8 padding) + its bottom margin + a gap above it. The
+// pill is positioned at `insets.bottom + spacing.md`, so screens must add the
+// device's bottom inset too (gesture bar / home indicator) — use
+// `useTabBarClearance()` rather than this constant alone, or the last element
+// on a screen ends up behind the pill.
 export const TAB_BAR_CLEARANCE = 44 + spacing.sm * 2 + spacing.md + spacing.md;
+
+export function useTabBarClearance(): number {
+  const insets = useSafeAreaInsets();
+  return TAB_BAR_CLEARANCE + insets.bottom;
+}
 
 // Icon-only floating pill, one per active elder check-in — labels would repeat
 // what the icon already says, and this is a 4-item bar so shape alone reads fine.

@@ -16,7 +16,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Avatar, Banner, EmptyState, ErrorState } from '@/components/ui';
-import { TAB_BAR_CLEARANCE } from '@/components/ui/TabBar';
+import { useTabBarClearance } from '@/components/ui/TabBar';
 import { buildChatItems, ChatSkeleton, DaySeparator, MessageBubble, type ChatItem } from '@/components/chat';
 import { colors, radii, shadow, spacing, typography } from '@/constants/tokens';
 import { getConversation } from '@/lib/api/endpoints';
@@ -42,6 +42,7 @@ function dedupeSortById(messages: ConversationMessage[]): ConversationMessage[] 
 
 export default function ChatScreen() {
   const insets = useSafeAreaInsets();
+  const tabBarClearance = useTabBarClearance();
   const elders = useElders();
   const elder = elders.data?.[0];
   const honorific = elder?.honorific ?? 'Eyang';
@@ -221,7 +222,7 @@ export default function ChatScreen() {
         </View>
       ) : null}
 
-      <View style={[styles.body, !elder && styles.bodyNoFooter]}>
+      <View style={[styles.body, !elder && { paddingBottom: tabBarClearance }]}>
         {showSkeleton ? (
           <ChatSkeleton />
         ) : eldersError ? (
@@ -299,7 +300,7 @@ export default function ChatScreen() {
       </View>
 
       {elder ? (
-        <View style={styles.footer}>
+        <View style={[styles.footer, { marginBottom: tabBarClearance }]}>
           <Ionicons name="lock-closed-outline" size={14} color={colors.textMuted} style={styles.footerIcon} />
           <Text style={styles.footerText}>
             Ini percakapan {honorific} dengan {companionName}, kirim pesan lewat{' '}
@@ -354,9 +355,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.sm,
   },
-  bodyNoFooter: {
-    paddingBottom: TAB_BAR_CLEARANCE,
-  },
   centerBlock: {
     flex: 1,
     justifyContent: 'center',
@@ -405,7 +403,6 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     marginHorizontal: spacing.lg,
     marginTop: spacing.sm,
-    marginBottom: TAB_BAR_CLEARANCE,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: radii.card,

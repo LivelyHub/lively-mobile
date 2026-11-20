@@ -8,7 +8,7 @@ import { AlertRow } from '@/components/alerts/AlertRow';
 import { AlertsSkeleton } from '@/components/alerts/AlertsSkeleton';
 import { sortAlertsByUrgency } from '@/components/home/alertPresentation';
 import { Banner, EmptyState, ErrorState } from '@/components/ui';
-import { TAB_BAR_CLEARANCE } from '@/components/ui/TabBar';
+import { useTabBarClearance } from '@/components/ui/TabBar';
 import { colors, radii, spacing, typography } from '@/constants/tokens';
 import { usePushPermission } from '@/hooks/usePushRegistration';
 import { useAlerts, useElders } from '@/lib/api/hooks';
@@ -18,6 +18,7 @@ const POLL_MS = 60_000; // Alerts refresh every 60s while focused (M8.2).
 
 export default function AlertsScreen() {
   const insets = useSafeAreaInsets();
+  const tabBarClearance = useTabBarClearance();
   const elders = useElders();
   const alerts = useAlerts({ refetchInterval: POLL_MS });
   const [refreshing, setRefreshing] = useState(false);
@@ -65,7 +66,10 @@ export default function AlertsScreen() {
   return (
     <ScrollView
       style={styles.screen}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.md }]}
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: insets.top + spacing.md, paddingBottom: tabBarClearance },
+      ]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
       }
@@ -176,7 +180,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: TAB_BAR_CLEARANCE,
     gap: spacing.lg,
   },
   title: {

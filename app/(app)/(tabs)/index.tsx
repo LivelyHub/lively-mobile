@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { Banner, Button, EmptyState, ErrorState, ProfileMenu } from '@/components/ui';
-import { TAB_BAR_CLEARANCE } from '@/components/ui/TabBar';
+import { useTabBarClearance } from '@/components/ui/TabBar';
 import { AlertCard } from '@/components/home/AlertCard';
 import { sortAlertsByUrgency } from '@/components/home/alertPresentation';
 import { ElderCard } from '@/components/home/ElderCard';
@@ -27,6 +27,7 @@ function greetingWord(hour: number): string {
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const tabBarClearance = useTabBarClearance();
   const queryClient = useQueryClient();
   const elders = useElders({ refetchInterval: POLL_MS });
   const alerts = useAlerts({ refetchInterval: POLL_MS });
@@ -66,7 +67,10 @@ export default function HomeScreen() {
   return (
     <ScrollView
       style={styles.screen}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.md }]}
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: insets.top + spacing.md, paddingBottom: tabBarClearance },
+      ]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
       }
@@ -169,7 +173,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: TAB_BAR_CLEARANCE,
     gap: spacing.lg,
   },
   header: {

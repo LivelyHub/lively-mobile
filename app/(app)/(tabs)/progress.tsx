@@ -13,12 +13,13 @@ import {
   StreakSection,
 } from '@/components/progress';
 import { Banner, EmptyState, ErrorState } from '@/components/ui';
-import { TAB_BAR_CLEARANCE } from '@/components/ui/TabBar';
+import { useTabBarClearance } from '@/components/ui/TabBar';
 import { colors, radii, shadow, spacing, typography } from '@/constants/tokens';
 import { useElders, useProgress } from '@/lib/api/hooks';
 
 export default function ProgressScreen() {
   const insets = useSafeAreaInsets();
+  const tabBarClearance = useTabBarClearance();
   const elders = useElders();
   const elder = elders.data?.[0];
   const honorific = elder?.honorific ?? 'Eyang';
@@ -45,7 +46,10 @@ export default function ProgressScreen() {
   return (
     <ScrollView
       style={styles.screen}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.md }]}
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: insets.top + spacing.md, paddingBottom: tabBarClearance },
+      ]}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
       }
@@ -140,7 +144,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: TAB_BAR_CLEARANCE,
     gap: spacing.lg,
   },
   title: {
